@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ShofeRider | Drive, Deliver, Earn with ZimConnect</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial;background:#f4f5f7}
+.header{background:linear-gradient(110deg,#006400 0%,#f7a800 50%,#d71920 100%);color:#fff;text-align:center;padding:30px 15px}
+.header h1{margin:0;font-size:32px}
+.header p{margin:5px 0;font-size:15px}
+.btn{display:block;background:#006400;color:#fff;text-align:center;padding:16px;border-radius:10px;text-decoration:none;font-weight:bold;font-size:17px;margin:12px 15px}
+.btn.orange{background:#ff9800;color:#111}
+.btn.red{background:#d71920}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:15px}
+.card{background:#fff;padding:15px;border-radius:12px;box-shadow:0 2px 8px #0001;text-align:center}
+.card h3{margin:8px 0;color:#006400;font-size:15px}
+.badge{background:#ffd700;color:#111;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:bold}
+.section{background:#fff;margin:15px;border-radius:12px;padding:15px}
+.section h2{color:#006400;margin-top:0}
+input,select{width:100%;padding:12px;margin:6px 0;border:1px solid #ccc;border-radius:8px}
+.success{color:#087f23;font-weight:bold}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🚗 SHOFE RIDER</h1>
+  <p>Driver App for ZimConnect</p>
+  <span class="badge">EARN IN USD</span>
+</div>
+
+<!-- A. DOWNLOAD BUTTON -->
+<a href="#" id="downloadBtn" class="btn">📱 DOWNLOAD ANDROID APP</a>
+<a href="https://zimc.github.io/Connectzim/" class="btn" style="background:#444">⬅️ BACK TO ZIMCONNECT</a>
+
+<!-- SERVICES GRID -->
+<div class="grid">
+  <div class="card">
+    <div style="font-size:28px">🚕</div>
+    <h3>CITY DRIVER</h3>
+    <p class="small">Rides in Harare, Byo, Mutare</p>
+  </div>
+  <div class="card">
+    <div style="font-size:28px">🛣️</div>
+    <h3>CITY TO CITY</h3>
+    <p class="small">Long distance trips</p>
+  </div>
+  <div class="card">
+    <div style="font-size:28px">🏍️</div>
+    <h3>BIKER COURIER</h3>
+    <p class="small">Packages & Food Delivery</p>
+  </div>
+  <div class="card">
+    <div style="font-size:28px">📦</div>
+    <h3>PACKAGING</h3>
+    <p class="small">Van & Truck Logistics</p>
+  </div>
+  <div class="card">
+    <div style="font-size:28px">🟢</div>
+    <h3>LIVE RIDE</h3>
+    <p class="small">Go Online & Get Rides</p>
+  </div>
+  <div class="card">
+    <div style="font-size:28px">🛠️</div>
+    <h3>ROADSIDE</h3>
+    <p class="small">Towing, Fuel, Battery</p>
+  </div>
+  <div class="card">
+    <div style="font-size:28px">🗺️</div>
+    <h3>OFFLINE MAPS</h3>
+    <p class="small">No Data Needed</p>
+  </div>
+  <div class="card">
+    <div style="font-size:28px">🔔</div>
+    <h3>PUSH ALERTS</h3>
+    <p class="small">Instant Ride Requests</p>
+  </div>
+</div>
+
+<!-- B. DRIVER SIGNUP FORM -->
+<div class="section">
+  <h2>🚀 Become a Shofe Driver</h2>
+  <p>Register in 2 minutes. Approval in 24hrs.</p>
+  <input id="dName" placeholder="Full Name">
+  <input id="dPhone" placeholder="WhatsApp Number +263...">
+  <select id="dType">
+    <option value="">Select Vehicle Type</option>
+    <option value="car">City Car</option>
+    <option value="long">City to City Car</option>
+    <option value="bike">Biker Courier</option>
+    <option value="van">Van/Truck Packaging</option>
+  </select>
+  <button class="btn orange" onclick="registerDriver()">SUBMIT APPLICATION</button>
+  <div id="regStatus" class="success"></div>
+</div>
+
+<!-- C. FEATURES -->
+<div class="section">
+  <h2>App Features</h2>
+  <ul>
+    <li><b>Live Button:</b> Toggle Online/Offline to receive rides instantly</li>
+    <li><b>Roadside Assistance:</b> Drivers can accept towing, battery, fuel jobs</li>
+    <li><b>Offline Navigation:</b> Google Maps works with downloaded maps</li>
+    <li><b>Courier Mode:</b> Bikers get package + food delivery requests</li>
+    <li><b>City + Long Distance:</b> Separate pricing for local vs intercity</li>
+    <li><b>Real-time Earnings:</b> See cash after every trip</li>
+  </ul>
+  <p><b>Tech:</b> Flutter 3.22 + Firebase + Google Maps + Provider</p>
+  <p><b>Package:</b> com.zimconnect.shoferider</p>
+</div>
+
+<script>
+// C. APK DOWNLOAD - replace with your real APK link
+document.getElementById('downloadBtn').href = "https://github.com/ZimC/shofe-rider/releases/download/v1.0/shoferider.apk"
+
+// B. DRIVER REGISTRATION - saves to Firebase
+const SUPABASE_URL = "https://vnbsvnnmajtvqjhslllw.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_HbGBE-Nq0YXZhRRhf90_aQ_Bjn37BHh";
+let db = window.supabase?.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+
+async function registerDriver(){
+  const name = document.getElementById('dName').value;
+  const phone = document.getElementById('dPhone').value;
+  const type = document.getElementById('dType').value;
+  
+  if(!name || !phone || !type){ alert("Fill all fields"); return; }
+  
+  const {error} = await db.from('drivers').insert([{name,phone,vehicle_type:type,status:'pending'}]);
+  
+  if(error){ alert("Error: " + error.message); }
+  else{
+    document.getElementById('regStatus').innerText = "✅ Application received! We'll WhatsApp you in 24hrs";
+    document.getElementById('dName').value = "";
+    document.getElementById('dPhone').value = "";
+  }
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+</body>
+</html>
