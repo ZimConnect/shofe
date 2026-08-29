@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Driver Dashboard | ShofeRider</title>
+<style>
+body{margin:0;font-family:Arial;background:#111;color:#fff;text-align:center}
+.header{padding:20px;background:#006400}
+.status{font-size:22px;margin:15px 0}
+.live-btn{width:200px;height:200px;border-radius:50%;border:0;font-size:24px;font-weight:bold;margin:20px auto;display:block;cursor:pointer}
+.live-off{background:#d71920;color:#fff}
+.live-on{background:#00c853;color:#fff;box-shadow:0 0 30px #00c853}
+.card{background:#222;margin:15px;border-radius:12px;padding:15px;text-align:left}
+.ride{border-left:4px solid #ff9800;padding:10px;margin:10px 0;background:#1a1a1a}
+.btn{width:48%;padding:12px;border:0;border-radius:8px;font-weight:bold}
+.accept{background:#00c853;color:#111}
+.decline{background:#444;color:#fff}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🚗 SHOFE DRIVER</h1>
+  <p id="driverName">Welcome Driver</p>
+</div>
+
+<div class="status" id="statusText">You are OFFLINE</div>
+<button id="liveBtn" class="live-btn live-off" onclick="toggleLive()">GO LIVE</button>
+
+<div class="card">
+  <h3>📊 Today's Earnings</h3>
+  <h2>$0.00 USD</h2>
+  <p>12 Rides Completed</p>
+</div>
+
+<div class="card" id="rideRequests" style="display:none">
+  <h3>🔔 NEW RIDE REQUEST</h3>
+  <div class="ride">
+    <b>From:</b> Sam Levy Village<br>
+    <b>To:</b> Eastgate Mall<br>
+    <b>Fare:</b> $8.50 USD<br>
+    <button class="btn accept" onclick="acceptRide()">ACCEPT</button>
+    <button class="btn decline" onclick="declineRide()">DECLINE</button>
+  </div>
+</div>
+
+<div class="card">
+  <h3>🛠️ Quick Actions</h3>
+  <button class="btn" style="background:#1976d2;color:#fff" onclick="alert('Roadside Mode On')">Roadside</button>
+  <button class="btn" style="background:#ff9800;color:#111" onclick="alert('Courier Mode On')">Courier</button>
+</div>
+
+<a href="index.html" style="color:#aaa">⬅️ Back to Home</a>
+
+<script>
+let isLive = false;
+function toggleLive(){
+  isLive = !isLive;
+  const btn = document.getElementById('liveBtn');
+  const status = document.getElementById('statusText');
+  const requests = document.getElementById('rideRequests');
+  
+  if(isLive){
+    btn.className = "live-btn live-on";
+    btn.innerText = "GO OFFLINE";
+    status.innerText = "You are ONLINE - Waiting for rides";
+    status.style.color = "#00c853";
+    requests.style.display = "block";
+  } else {
+    btn.className = "live-btn live-off";
+    btn.innerText = "GO LIVE";
+    status.innerText = "You are OFFLINE";
+    status.style.color = "#fff";
+    requests.style.display = "none";
+  }
+}
+function acceptRide(){ alert("Ride Accepted! Opening Maps...") }
+function declineRide(){ alert("Ride Declined") }
+</script>
+</body>
+</html>
