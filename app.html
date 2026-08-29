@@ -19,6 +19,72 @@ input{width:100%;padding:12px;margin:6px 0;border-radius:8px;border:0}
 .live-btn{width:180px;height:180px;border-radius:50%;margin:20px auto;display:block;font-size:20px}
 </style>
 </head>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "PASTE_YOURS",
+  authDomain: "shofe-zim.firebaseapp.com",
+  projectId: "shofe-zim",
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// REPLACE YOUR OLD postRide() FUNCTION
+function postRide(){
+  const pickup = document.getElementById('pickup').value;
+  const dropoff = document.getElementById('dropoff').value;
+  const bid = Number(document.getElementById('bid').value);
+  
+  db.collection("rides").add({
+    pickup, dropoff, passenger_bid: bid,
+    status: "open",
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+  document.getElementById('pStatus').innerText = `Posted! Waiting for drivers to bid on $${bid}`;
+}
+
+// REPLACE YOUR OLD toggleLive() FUNCTION
+function toggleLive(){
+  isLive = !isLive;
+  document.getElementById('liveBtn').style.background = isLive ? '#00c853' : '#d71920';
+  document.getElementById('liveBtn').innerText = isLive ? 'GO OFFLINE' : 'GO LIVE';
+  document.getElementById('rideBids').style.display = isLive ? 'block' : 'none';
+  
+  if(isLive){ listenForBids() }
+}
+
+// NEW: LISTEN FOR OPEN RIDES IN REAL TIME
+function listenForBids(){
+  db.collection("rides").where("status","==","open")
+  .onSnapshot(snapshot => {
+    const container = document.getElementById('rideBids');
+    container.innerHTML = "<h3>🔔 INCOMING BIDS</h3>";
+    snapshot.forEach(doc => {
+      const ride = doc.data();
+      container.innerHTML += `
+        <div class="card" style="background:#333">
+          <b>${ride.pickup} → ${ride.dropoff}</b><br>
+          Passenger Bid: $${ride.passenger_bid}<br>
+          <button class="btn green" onclick="acceptBid('${doc.id}', ${ride.passenger_bid})">ACCEPT $${ride.passenger_bid}</button>
+          <button class="btn" onclick="counterBid('${doc.id}')">COUNTER OFFER</button>
+        </div>
+      `;
+    });
+  });
+}
+
+function acceptBid(rideId, price){
+  db.collection("rides").doc(rideId).update({status: "accepted", driver_price: price});
+  alert(`Accepted ride for $${price}`)
+}
+
+function counterBid(rideId){ 
+  const p = prompt("Your counter price $"); 
+  db.collection("bids").add({rideId, driver_price: Number(p)})
+  alert(`Countered $${p}`) 
+</script>
 <body>
 
 <div class="header">
