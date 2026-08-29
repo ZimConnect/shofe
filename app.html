@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Shofe App</title>
+<style>
+body{margin:0;font-family:Arial;background:#111;color:#fff}
+.header{padding:15px;background:#006400;display:flex;justify-content:space-between;align-items:center}
+.toggle{background:#333;padding:8px;border-radius:20px}
+.toggle button{border:0;padding:8px 12px;border-radius:20px;background:transparent;color:#fff}
+.toggle .active{background:#ff9800;color:#111}
+.section{display:none;padding:15px}
+.section.active{display:block}
+.card{background:#222;margin:10px 0;padding:15px;border-radius:12px}
+.btn{width:100%;padding:14px;border:0;border-radius:10px;font-weight:bold;margin:8px 0}
+.btn.green{background:#00c853;color:#111}
+.btn.orange{background:#ff9800;color:#111}
+input{width:100%;padding:12px;margin:6px 0;border-radius:8px;border:0}
+.live-btn{width:180px;height:180px;border-radius:50%;margin:20px auto;display:block;font-size:20px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <img src="assets/shofe-logo.png" style="width:40px;border-radius:10px">
+  <div class="toggle">
+    <button id="riderTab" onclick="switchMode('passenger')">Passenger</button>
+    <button id="driverTab" onclick="switchMode('driver')">Driver</button>
+  </div>
+</div>
+
+<!-- PASSENGER MODE -->
+<section id="passenger" class="section">
+  <h2>Where to?</h2>
+  <div class="card">
+    <input id="pickup" placeholder="📍 Pickup">
+    <input id="dropoff" placeholder="🏁 Dropoff">
+    <h3>Your Bid $USD</h3>
+    <input id="bid" type="number" placeholder="e.g. 10">
+    <button class="btn orange" onclick="postRide()">POST RIDE REQUEST</button>
+    <p id="pStatus"></p>
+  </div>
+  <div class="card">
+    <h3>⭐ Rate Driver</h3>
+    <p>Last trip: Driver John - $12</p>
+    <button onclick="rate(5)">⭐⭐⭐⭐⭐</button>
+  </div>
+</section>
+
+<!-- DRIVER MODE -->
+<section id="driver" class="section">
+  <h2>Driver Dashboard</h2>
+  <div class="card" style="text-align:center">
+    <div>Earnings Today: $0.00</div>
+    <button id="liveBtn" class="live-btn" style="background:#d71920" onclick="toggleLive()">GO LIVE</button>
+  </div>
+  <div id="rideBids" class="card" style="display:none">
+    <h3>🔔 INCOMING BIDS</h3>
+    <div class="card" style="background:#333">
+      <b>CBD → Airport</b><br>
+      Passenger Bid: $15<br>
+      Distance: 18km<br>
+      <button class="btn green" onclick="acceptBid(15)">ACCEPT $15</button>
+      <button class="btn" onclick="counterBid()">COUNTER OFFER</button>
+    </div>
+  </div>
+</section>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+let mode = params.get('mode') || 'passenger';
+let isLive = false;
+
+function switchMode(m){
+  mode = m;
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(m).classList.add('active');
+  document.getElementById('riderTab').classList.toggle('active', m=='passenger');
+  document.getElementById('driverTab').classList.toggle('active', m=='driver');
+}
+switchMode(mode);
+
+function postRide(){
+  const bid = document.getElementById('bid').value;
+  document.getElementById('pStatus').innerText = `Posted! Waiting for drivers to bid on $${bid}`;
+  // Push to Firebase 'rides' table
+}
+
+function toggleLive(){
+  isLive = !isLive;
+  document.getElementById('liveBtn').style.background = isLive ? '#00c853' : '#d71920';
+  document.getElementById('liveBtn').innerText = isLive ? 'GO OFFLINE' : 'GO LIVE';
+  document.getElementById('rideBids').style.display = isLive ? 'block' : 'none';
+}
+
+function acceptBid(price){ alert(`Accepted ride for $${price}. Calling passenger...`) }
+function counterBid(){ const p = prompt("Your counter price $"); alert(`Countered $${p}`) }
+function rate(s){ alert(`Rated ${s} stars. Thank you!`) }
+</script>
+</body>
+</html>
