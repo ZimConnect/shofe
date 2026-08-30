@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#06140d">
+<title>Shofe - Book a Ride</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{height:100vh;color:#fff;background:linear-gradient(145deg,#03100a 0%,#07130e 100%);overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial}
+.app{max-width:600px;height:100vh;margin:auto;padding:16px;display:flex;flex-direction:column}
+
+.header{display:flex;align-items:center;gap:12px;padding-bottom:12px}
+.header img{width:50px;height:50px;border-radius:14px;object-fit:contain}
+.header h1{font-size:24px;font-weight:900}
+
+.card{background:#1a1a1a;border:1px solid #333;border-radius:16px;padding:16px;margin:10px 0}
+.card h2{margin-bottom:12px;font-size:18px;color:#00e676}
+
+input,select{width:100%;padding:14px;margin:8px 0;border-radius:12px;border:1px solid #444;background:#222;color:#fff;font-size:15px}
+.btn{width:100%;padding:16px;border:0;border-radius:14px;background:linear-gradient(90deg,#00c853,#00a844);color:#000;font-weight:900;font-size:16px;margin-top:10px;cursor:pointer}
+.btn:active{transform:scale(0.98)}
+.status{margin-top:10px;color:#66ee99;text-align:center;font-size:13px}
+
+.back{margin-top:auto;text-align:center;color:#888;text-decoration:none;font-size:13px}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <img src="assets/shofe-logo.png" alt="Shofe">
+    <h1>REQUEST A RIDE</h1>
+  </div>
+
+  <div class="card">
+    <h2>📍 Trip Details</h2>
+    <input id="pickup" placeholder="Pickup Location e.g. Joina City">
+    <input id="dropoff" placeholder="Dropoff Location e.g. Airport">
+    
+    <select id="rideType">
+      <option value="Economy">Economy - $5 base</option>
+      <option value="Comfort">Comfort - $10 base</option>
+      <option value="XL">XL - $15 base</option>
+    </select>
+    
+    <input id="bid" type="number" placeholder="Your Bid $USD e.g. 10">
+    
+    <button class="btn" onclick="requestRide()">REQUEST SHOFE NOW</button>
+    <p id="rideStatus" class="status"></p>
+  </div>
+
+  <div class="card">
+    <h2>🚗 Want to Drive?</h2>
+    <a href="shofe-driver.html" class="btn" style="background:#1685e8;color:#fff;display:block;text-align:center;text-decoration:none">BECOME A DRIVER</a>
+  </div>
+
+  <a href="index.html" class="back">← Back to Home</a>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+// PASTE YOUR FIREBASE CONFIG HERE
+const firebaseConfig = {
+  apiKey: "PASTE_YOURS",
+  authDomain: "shofe-zim.firebaseapp.com",
+  projectId: "shofe-zim",
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+function requestRide(){
+  const pickup = document.getElementById('pickup').value;
+  const dropoff = document.getElementById('dropoff').value;
+  const rideType = document.getElementById('rideType').value;
+  const bid = Number(document.getElementById('bid').value);
+  
+  if(!pickup || !dropoff || !bid){
+    rideStatus.innerText = "⚠️ Please fill all fields";
+    return;
+  }
+  
+  db.collection("jobs").add({
+    type: "ride",
+    pickup, dropoff, rideType, passenger_bid: bid,
+    status: "open",
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(() => {
+    rideStatus.innerText = `✅ Ride posted! Waiting for drivers to bid on $${bid}`;
+    document.getElementById('pickup').value = "";
+    document.getElementById('dropoff').value = "";
+    document.getElementById('bid').value = "";
+  });
+}
+</script>
+</body>
+</html>
