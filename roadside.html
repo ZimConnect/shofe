@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shofe Roadside</title>
+<style>
+body{margin:0;background:#111;color:#fff;font-family:Arial}
+.header{display:flex;align-items:center;padding:15px;background:#ff8500}
+.header img{width:50px;height:50px;border-radius:14px;margin-right:12px}
+.card{background:#222;margin:10px;border-radius:12px;padding:16px}
+input,select{width:100%;padding:14px;margin:8px 0;border-radius:12px;border:1px solid #444;background:#333;color:#fff;font-size:15px}
+.btn{width:100%;padding:16px;border:0;border-radius:14px;background:linear-gradient(90deg,#ff8500,#ff5f00);color:#000;font-weight:900;font-size:16px;margin-top:10px}
+.status{margin-top:10px;color:#ffa500;text-align:center}
+.back{display:block;text-align:center;margin:15px;color:#888;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="header">
+  <img src="assets/shofe-logo.png" alt="Shofe">
+  <h1>🔧 ROADSIDE HELP</h1>
+</div>
+
+<div class="card">
+  <h2>What's the problem?</h2>
+  <input id="rLocation" placeholder="📍 Your Location e.g. Samora & 1st">
+  <select id="rProblem">
+    <option>Flat Tire</option>
+    <option>Dead Battery / Jump Start</option>
+    <option>Out of Fuel</option>
+    <option>Towing</option>
+    <option>Locked Out</option>
+  </select>
+  <input id="rCar" placeholder="Car Make & Color e.g. Toyota White">
+  <input id="rBid" type="number" placeholder="Your Offer $USD e.g. 20">
+  
+  <button class="btn" onclick="requestRoadside()">REQUEST MECHANIC NOW</button>
+  <p id="rStatus" class="status"></p>
+</div>
+
+<a href="index.html" class="back">← Back to Home</a>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = {apiKey:"PASTE_YOURS", projectId:"shofe-zim"};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+function requestRoadside(){
+  const location = rLocation.value;
+  const problem = rProblem.value;
+  const car = rCar.value;
+  const bid = Number(rBid.value);
+  
+  if(!location || !bid){
+    rStatus.innerText = "⚠️ Please add location and offer";
+    return;
+  }
+  
+  db.collection("jobs").add({
+    type: "roadside",
+    location, problem, car, passenger_bid: bid,
+    status: "open",
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(() => {
+    rStatus.innerText = `✅ Mechanic notified! Offer: $${bid}`;
+    rLocation.value = ""; rBid.value = "";
+  });
+}
+</script>
+</body>
+</html>
