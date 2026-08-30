@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#06140d">
+<title>Shofe - Zim's Ride, Help & Drive Home App</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+body{
+  color:#fff;
+  background:
+    radial-gradient(circle at 50% -10%,rgba(0,200,83,.22),transparent 36%),
+    linear-gradient(145deg,#03100a 0%,#07130e 45%,#05090b 100%);
+  overflow-x:hidden;
+}
+button,a{font:inherit} button{cursor:pointer}
+.app{max-width:900px;min-height:100vh;margin:auto;padding:18px 18px 28px}
+.topbar{height:62px;display:flex;align-items:center;justify-content:space-between}
+.icon-btn{
+  width:48px;height:48px;border:1px solid rgba(255,255,255,.15);border-radius:15px;
+  background:rgba(0,0,0,.28);color:#fff;font-size:25px;display:grid;place-items:center;
+}
+.icon-btn:hover{border-color:#00d95a;background:rgba(0,200,83,.12)}
+.menu-lines span{display:block;width:28px;height:3px;background:#fff;border-radius:3px;margin:6px auto}
+.bell{position:relative}
+.dot{position:absolute;width:9px;height:9px;border-radius:50%;background:#00e676;right:7px;top:6px;border:2px solid #07130e}
+
+.hero{text-align:center;padding:16px 0 12px}
+.logo-wrap{
+  width:260px;height:260px;margin:0 auto 14px;border-radius:52px;
+  display:grid;place-items:center;overflow:hidden;
+  filter:drop-shadow(0 18px 25px rgba(0,0,0,.45));
+}
+.logo{width:100%;height:100%;object-fit:contain}
+.hero h1{font-size:clamp(42px,9vw,72px);line-height:1;color:#fff;font-weight:900;letter-spacing:2px;text-shadow:0 5px 18px #000;margin-bottom:12px}
+.hero p{color:#65e994;font-size:clamp(14px,3.5vw,21px);font-weight:700;letter-spacing:.6px;text-transform:uppercase}
+.features{display:flex;justify-content:center;align-items:center;gap:0;margin:24px auto 30px;max-width:720px}
+.feature{flex:1;text-align:center;color:#ddd;font-size:15px}
+.feature strong{display:block;color:#00e676;font-size:30px;margin-bottom:5px}
+.feature:not(:last-child){border-right:1px solid rgba(255,255,255,.2)}
+
+.actions{display:grid;gap:15px}
+.action{
+  position:relative;width:100%;min-height:118px;border:0;border-radius:25px;
+  color:#fff;text-align:left;padding:18px 68px 18px 118px;
+  box-shadow:0 10px 25px rgba(0,0,0,.32);overflow:hidden;
+  transition:transform .18s,filter .18s;
+}
+.action:hover{transform:translateY(-2px);filter:brightness(1.08)}
+.ride{background:linear-gradient(135deg,#00c853,#00a844)}
+.drive{background:linear-gradient(135deg,#1685e8,#0966c8)}
+.roadside{background:linear-gradient(135deg,#ff8500,#ff5f00)}
+.night{background:linear-gradient(135deg,#8d2bd4,#6514a5)}
+.action-icon{
+  position:absolute;left:30px;top:50%;transform:translateY(-50%);
+  width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.72);
+  display:grid;place-items:center;font-size:39px
+}
+.action h2{font-size:22px;font-weight:900;margin-bottom:5px}
+.action p{font-size:16px;color:rgba(255,255,255,.88);line-height:1.3}
+.arrow{
+  position:absolute;right:25px;top:50%;transform:translateY(-50%);
+  width:52px;height:52px;border-radius:50%;background:#fff;color:#08733a;
+  display:grid;place-items:center;font-size:36px;font-weight:300
+}
+
+.safety{
+  margin-top:16px;padding:16px 20px;border-radius:20px;background:rgba(8,29,21,.9);
+  border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;gap:15px;cursor:pointer
+}
+.safety-icon{width:58px;height:58px;border-radius:50%;background:#10c95a;display:grid;place-items:center;font-size:29px;flex:none}
+.safety h3{font-size:18px;margin-bottom:3px}.safety p{color:#aaa;font-size:14px}.safety-arrow{margin-left:auto;font-size:34px;color:#00d95a}
+
+.bottom-features{
+  margin-top:20px;border:1px solid rgba(255,255,255,.14);border-radius:38px;
+  padding:18px 12px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;
+  background:rgba(4,15,11,.75)
+}
+.bottom-feature{text-align:center;color:#ddd;font-size:13px}
+.bottom-feature .ico{font-size:30px;color:#00d95a;margin-bottom:4px}.bottom-feature small{display:block;color:#999;font-size:11px;margin-top:2px}
+.footer{text-align:center;color:#68716d;font-size:11px;margin-top:18px}
+
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(5px);z-index:20;padding:18px;overflow:auto}
+.overlay.show{display:block}
+.panel{
+  max-width:560px;margin:25px auto;background:#101814;border:1px solid #294436;border-radius:24px;
+  box-shadow:0 25px 70px #000;padding:22px
+}
+.panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.panel h2{font-size:23px}
+.close{background:#222;color:#fff;border:1px solid #444;width:40px;height:40px;border-radius:12px;font-size:22px}
+.menu-item{
+  width:100%;padding:16px;border:1px solid #294436;background:#15211b;color:#fff;border-radius:14px;
+  text-align:left;font-weight:700;margin:8px 0;cursor:pointer
+}
+.menu-item:hover{border-color:#00d95a}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <button class="icon-btn" onclick="openPanel('menuPanel')" aria-label="Open menu">
+      <span class="menu-lines"><span></span><span></span><span></span></span>
+    </button>
+    <button class="icon-btn bell" onclick="showNotice()" aria-label="Notifications">🔔<span class="dot"></span></button>
+  </div>
+
+  <section class="hero">
+    <div class="logo-wrap">
+      <img src="assets/shofe-logo.png" class="logo" alt="Shofe logo">
+    </div>
+    <h1>SHOFE</h1>
+    <p>ZIM'S #1 RIDE, HELP & DRIVE HOME APP</p>
+  </section>
+
+  <div class="features">
+    <div class="feature"><strong>🛡️</strong>Safe Rides</div>
+    <div class="feature"><strong>⭐</strong>Trusted Drivers</div>
+    <div class="feature"><strong>🔔</strong>24/7 Support</div>
+  </div>
+
+  <main class="actions">
+    <button class="action ride" onclick="go('app.html?mode=passenger')">
+      <span class="action-icon">🚕</span><h2>I NEED A RIDE</h2><p>Book a ride in minutes</p><span class="arrow">›</span>
+    </button>
+
+    <button class="action drive" onclick="go('app.html?mode=driver')">
+      <span class="action-icon">🚗</span><h2>I WANT TO DRIVE</h2><p>Join and start earning</p><span class="arrow">›</span>
+    </button>
+
+    <button class="action roadside" onclick="go('app.html?mode=roadside')">
+      <span class="action-icon">🔧</span><h2>ROADSIDE ASSISTANCE</h2><p>Help is just a tap away</p><span class="arrow">›</span>
+    </button>
+
+    <button class="action night" onclick="go('app.html?mode=nightowl')">
+      <span class="action-icon">🌙</span><h2>NIGHT OWL</h2><p>Drive my car, I'll drive you</p><span class="arrow">›</span>
+    </button>
+  </main>
+
+  <div class="safety" onclick="openPanel('safetyPanel')">
+    <div class="safety-icon">🛡️</div>
+    <div><h3>Your Safety, Our Priority</h3><p>Verified drivers. Secure rides. Real support.</p></div>
+    <div class="safety-arrow">›</div>
+  </div>
+
+  <div class="bottom-features">
+    <div class="bottom-feature"><div class="ico">⚡</div>Fast<small>Quick pickups</small></div>
+    <div class="bottom-feature"><div class="ico">$</div>Affordable<small>Fair prices</small></div>
+    <div class="bottom-feature"><div class="ico">🛡️</div>Reliable<small>Always there</small></div>
+    <div class="bottom-feature"><div class="ico">🇿🇼</div>Zimbabwe<small>Proudly local</small></div>
+  </div>
+  <div class="footer">© 2026 Shofe • Made in Harare, Zimbabwe</div>
+</div>
+
+<!-- Main menu -->
+<div class="overlay" id="menuPanel">
+  <div class="panel">
+    <div class="panel-head"><h2>SHOFE Menu</h2><button class="close" onclick="closePanel('menuPanel')">×</button></div>
+    <button class="menu-item" onclick="go('app.html?mode=passenger')">🚕 Passenger - Get a Ride</button>
+    <button class="menu-item" onclick="go('app.html?mode=driver')">🚗 Driver - Go Online & Earn</button>
+    <button class="menu-item" onclick="openPanel('driverPanel')">👤 Driver Profile & Settings</button>
+    <button class="menu-item" onclick="openPanel('safetyPanel')">🛡️ Safety & Support</button>
+    <button class="menu-item" onclick="showNotice()">🔔 Notifications</button>
+  </div>
+</div>
+
+<!-- Safety -->
+<div class="overlay" id="safetyPanel">
+  <div class="panel">
+    <div class="panel-head"><h2>🛡️ Safety & Support</h2><button class="close" onclick="closePanel('safetyPanel')">×</button></div>
+    <div style="color:#bbb;line-height:1.7">
+      <p>• Driver verification and trip details should be checked before accepting a ride.</p>
+      <p>• Share your trip with someone you trust.</p>
+      <p>• For an emergency, contact local emergency services.</p>
+      <p>• SHOFE support can be connected from the app.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+function go(url){ window.location.href=url; }
+
+function openPanel(id){
+  document.querySelectorAll('.overlay').forEach(x=>x.classList.remove('show'));
+  document.getElementById(id).classList.add('show');
+}
+function closePanel(id){document.getElementById(id).classList.remove('show')}
+function showNotice(){
+  alert('🔔 SHOFE notifications\n\nYou have no new notifications.');
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape') document.querySelectorAll('.overlay').forEach(x=>x.classList.remove('show'));
+});
+</script>
+</body>
+</html>
