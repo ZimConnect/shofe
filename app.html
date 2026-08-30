@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shofe Driver</title>
+<style>
+body{margin:0;background:#111;color:#fff;font-family:Arial}
+.header{display:flex;align-items:center;padding:15px;background:#006400}
+.header img{width:50px;height:50px;border-radius:50%;margin-right:12px}
+.card{background:#222;margin:10px;border-radius:12px;padding:15px}
+.upload{display:flex;align-items:center;justify-content:space-between;padding:12px;background:#333;border-radius:10px;margin:8px 0}
+.upload input{display:none}
+.upload label{padding:8px 14px;background:#00c853;color:#000;border-radius:8px;font-weight:bold;cursor:pointer}
+.status{color:#00c853;font-size:12px}
+.btn{width:100%;padding:14px;border:0;border-radius:10px;background:#00c853;color:#000;font-weight:bold;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="header">
+  <img id="profilePic" src="https://i.pravatar.cc/100">
+  <div><h2 id="driverName">Lloyd Tawanda</h2><p>⭐ 4.83 (126)</p></div>
+</div>
+
+<div class="card">
+  <h3>Driver Verification</h3>
+  <p style="color:#aaa;font-size:13px">Upload documents to get verified and start driving</p>
+  
+  <div class="upload">
+    <span>📄 Driver's Licence</span>
+    <input type="file" id="licence" accept="image/*"><label for="licence">Upload</label>
+  </div>
+  <div class="upload">
+    <span>🤳 Selfie + Licence</span>
+    <input type="file" id="selfie" accept="image/*"><label for="selfie">Upload</label>
+  </div>
+  <div class="upload">
+    <span>🚗 Vehicle Registration</span>
+    <input type="file" id="reg" accept="image/*"><label for="reg">Upload</label>
+  </div>
+  <div class="upload">
+    <span>📸 Vehicle Front</span>
+    <input type="file" id="front" accept="image/*"><label for="front">Upload</label>
+  </div>
+  <div class="upload">
+    <span>📸 Vehicle Back</span>
+    <input type="file" id="back" accept="image/*"><label for="back">Upload</label>
+  </div>
+  <div class="upload">
+    <span>📸 Vehicle Sides</span>
+    <input type="file" id="sides" accept="image/*" multiple><label for="sides">Upload</label>
+  </div>
+  <div class="upload">
+    <span>🔢 License Plate + Color</span>
+    <input type="text" id="plate" placeholder="AHR 4546 Silver" style="width:50%;padding:8px;background:#444;border:0;border-radius:6px;color:#fff">
+  </div>
+  
+  <button class="btn" onclick="submitVerification()">SUBMIT FOR VERIFICATION</button>
+  <p id="status" class="status"></p>
+</div>
+
+<div class="card">
+  <h3>My Vehicle</h3>
+  <p>Daihatsu Mira<br><small>Silver • 2020 • AHR4546</small></p>
+  <button class="btn" style="background:#333;color:#fff">Change</button>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+<script>
+const firebaseConfig = {apiKey:"PASTE_YOURS", projectId:"shofe-zim", storageBucket:"shofe-zim.appspot.com"};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const storage = firebase.storage();
+
+function submitVerification(){
+  status.innerText = "✅ Submitted! We will verify within 24 hours";
+  // Here we would upload files to Firebase Storage and save to Firestore
+}
+</script>
+</body>
+</html>
