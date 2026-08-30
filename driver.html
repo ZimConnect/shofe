@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shofe Driver</title>
+<style>
+body{margin:0;background:#111;color:#fff;font-family:Arial}
+.header{display:flex;align-items:center;padding:15px;background:#006400}
+.header img{width:50px;height:50px;border-radius:50%;margin-right:12px}
+.live-btn{width:160px;height:160px;border-radius:50%;margin:20px auto;display:block;font-size:18px;background:#d71920;color:#fff;border:0;font-weight:900}
+.card{background:#222;margin:10px;border-radius:12px;padding:15px}
+.upload{display:flex;align-items:center;justify-content:space-between;padding:12px;background:#333;border-radius:10px;margin:8px 0}
+.upload video,.upload img{width:80px;height:80px;border-radius:8px;object-fit:cover;background:#000}
+.btn-cam{padding:8px 14px;background:#00c853;color:#000;border-radius:8px;font-weight:bold;border:0;cursor:pointer}
+.btn-cam.retake{background:#ff9800}
+.job{background:#333;padding:12px;border-radius:10px;margin:8px 0}
+.btn-accept{width:100%;padding:10px;border:0;border-radius:8px;background:#00c853;color:#000;font-weight:bold}
+</style>
+</head>
+<body>
+<div class="header">
+  <img id="profilePic" src="https://i.pravatar.cc/100">
+  <div><h2>Lloyd Tawanda</h2><p>⭐ 4.83 (126)</p></div>
+</div>
+
+<button id="liveBtn" class="live-btn" onclick="toggleLive()">GO LIVE</button>
+
+<div id="jobsCard" class="card" style="display:none">
+  <h3>🔔 INCOMING JOBS</h3>
+  <div id="jobsList">Waiting for rides...</div>
+</div>
+
+<div class="card">
+  <h3>Driver Verification - Take Photos</h3>
+
+  <div class="upload">
+    <div><b>📄 Driver's Licence</b><br><small id="licenceStatus">Not taken</small></div>
+    <video id="licenceVideo" autoplay playsinline style="display:none"></video>
+    <img id="licenceImg" style="display:none">
+    <button class="btn-cam" onclick="takePhoto('licence')">Take Photo</button>
+  </div>
+
+  <div class="upload">
+    <div><b>🤳 Selfie + Licence</b><br><small id="selfieStatus">Not taken</small></div>
+    <video id="selfieVideo" autoplay playsinline style="display:none"></video>
+    <img id="selfieImg" style="display:none">
+    <button class="btn-cam" onclick="takePhoto('selfie')">Take Selfie</button>
+  </div>
+
+  <div class="upload">
+    <div><b>🚗 Vehicle Front</b><br><small id="frontStatus">Not taken</small></div>
+    <video id="frontVideo" autoplay playsinline style="display:none"></video>
+    <img id="frontImg" style="display:none">
+    <button class="btn-cam" onclick="takePhoto('front')">Take Photo</button>
+  </div>
+
+  <div class="upload">
+    <div><b>🚗 Vehicle Back</b><br><small id="backStatus">Not taken</small></div>
+    <video id="backVideo" autoplay playsinline style="display:none"></video>
+    <img id="backImg" style="display:none">
+    <button class="btn-cam" onclick="takePhoto('back')">Take Photo</button>
+  </div>
+
+  <div class="upload">
+    <div><b>🔢 Plate + Color</b><br><small>Manual entry</small></div>
+    <input type="text" id="plate" placeholder="AHR 4546 Silver" style="width:50%;padding:8px;background:#444;border:0;border-radius:6px;color:#fff">
+  </div>
+
+  <button class="btn-cam" style="width:100%;margin-top:10px;background:#1685e8;color:#fff" onclick="submitVerification()">SUBMIT FOR VERIFICATION</button>
+  <p id="status" style="color:#00c853;text-align:center;margin-top:10px"></p>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+<script>
+const firebaseConfig = {apiKey:"PASTE_YOURS", projectId:"shofe-zim", storageBucket:"shofe-zim.appspot.com"};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const storage = firebase.storage();
+
+let isLive = false;
+let unsubscribe;
+let stream;
+let photos = {};
+
+async function startCamera(type){
+  if(stream) stream.getTracks().forEach(t => t.stop());
+  stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}});
+  if(type == 'selfie') stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:"user"}});
+  document.getElementById(type + 'Video').srcObject = stream;
+  document.getElementById(type + 'Video').style.display = 'block';
+}
+
+function takePhoto(type){
+  startCamera(type).then(() => {
+    setTimeout(() => {
+      const video = document.getElementById(type + 'Video');
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext('2d').drawImage(video, 0, 0);
+      const dataUrl = canvas.toDataURL('image/jpeg');
+
+      photos[type] = dataUrl;
+      document.getElementById(type + 'Img').src = dataUrl;
+      document.getElementById(type + 'Img').style.display = 'block';
+      video.style.display = 'none';
+      stream.getTracks().forEach(t => t.stop());
+      document.getElementById(type + 'Status').innerText = '✓ Taken';
+      document.querySelector(`[onclick="takePhoto('${type}')"]`).innerText = 'Retake';
+      document.querySelector(`[onclick="takePhoto('${type}')"]`).classList.add('retake');
+    }, 3000); // 3 second timer so user can pose
+  });
+}
+
+function submitVerification(){
+  status.innerText = "⏳ Uploading to Firebase...";
+  // Upload each photo to Firebase Storage
+  Object.keys(photos).forEach(key => {
+    const ref = storage.ref(`drivers/verification/${Date.now()}_${key}.jpg`);
+    ref.putString(photos[key], 'data_url').then(() => {
+      status.innerText = "✅ Submitted! We will verify within 24 hours";
+    });
+  });
+}
+
+function toggleLive(){
+  isLive =!isLive;
+  liveBtn.style.background = isLive? '#00c853' : '#d71920';
+  liveBtn.innerText = isLive? 'GO OFFLINE' : 'GO LIVE';
+  jobsCard.style.display = isLive? 'block' : 'none';
+  if(isLive){ listenJobs() } else { if(unsubscribe) unsubscribe(); }
+}
+
+function listenJobs(){
+  unsubscribe = db.collection("jobs").where("status","==","open")
+ .onSnapshot(snapshot => {
+    jobsList.innerHTML = "";
+    snapshot.forEach(doc => {
+      const job = doc.data();
+      jobsList.innerHTML += `
+        <div class="job">
+          <b>${job.type.toUpperCase()}</b><br>
+          ${job.pickup || job.location} → ${job.dropoff || ''}<br>
+          Bid: $${job.passenger_bid || '20+'}<br>
+          <button class="btn-accept" onclick="acceptJob('${doc.id}')">ACCEPT</button>
+        </div>
+      `;
+    });
+    if(snapshot.empty) jobsList.innerHTML = "Waiting for jobs...";
+  });
+}
+
+function acceptJob(id){
+  db.collection("jobs").doc(id).update({status:"accepted"});
+  alert("Job Accepted!");
+}
+</script>
+</body>
+  </html>
