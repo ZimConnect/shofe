@@ -1,1 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SHOFE Admin - Boss View</title>
+<style>
+body{margin:0;background:#050a07;color:#fff;font-family:Arial;padding:15px}
+.header{background:linear-gradient(90deg,#00c853,#006400);padding:20px;border-radius:16px;display:flex;justify-content:space-between;align-items:center}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:15px 0}
+.stat{background:#111e16;padding:15px;border-radius:12px;text-align:center}
+.stat b{font-size:28px;display:block;color:#00c853}
+.stat small{color:#888}
+.card{background:#111e16;border-radius:16px;padding:15px;margin:10px 0}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{color:#888;text-align:left;padding:8px} td{padding:10px 8px;border-top:1px solid #222}
+.badge{padding:4px 8px;border-radius:20px;font-size:11px;font-weight:900}
+.open{background:#ff9800;color:#000} .accepted{background:#00c853;color:#000} .done{background:#333;color:#fff}
+.btn{padding:8px 12px;border:0;border-radius:8px;font-weight:900;cursor:pointer;margin:2px}
+.del{background:#d71920;color:#fff} .clear{background:#222;color:#aaa;width:100%;padding:12px;margin-top:15px}
+</style>
+</head>
+<body>
 
+<div class="header">
+  <div><h2>👑 SHOFE ADMIN</h2><small>shoferider.com - Boss Dashboard</small></div>
+  <div style="text-align:right"><b id="today">$0.00</b><br><small>Total Revenue</small></div>
+</div>
+
+<div class="stats">
+  <div class="stat"><b id="totalRides">0</b><small>Total Rides</small></div>
+  <div class="stat"><b id="totalComm">0</b><small>Your 20% Commission</small></div>
+  <div class="stat"><b id="openJobs">0</b><small>Open Requests</small></div>
+  <div class="stat"><b id="drivers">3</b><small>Active Drivers</small></div>
+</div>
+
+<div class="card">
+  <h3>💰 Live Jobs - All Rides</h3>
+  <table>
+    <thead><tr><th>Time</th><th>From → To</th><th>Bid</th><th>Your Cut</th><th>Status</th><th></th></tr></thead>
+    <tbody id="jobsTable"><tr><td colspan="6" style="text-align:center;color:#888">No jobs yet</td></tr></tbody>
+  </table>
+  <button class="clear" onclick="clearAll()">🗑️ Clear All Data</button>
+  <button class="clear" onclick="seedDemo()" style="background:#00c853;color:#000">+ Add Demo Rides (Test)</button>
+</div>
+
+<div class="card">
+  <h3>🚗 Top Drivers (Today)</h3>
+  <table>
+    <tr><th>Driver</th><th>Rides</th><th>Earned</th></tr>
+    <tr><td>T. Chiremba - Aqua</td><td>6</td><td>$72</td></tr>
+    <tr><td>B. Moyo - Swift</td><td>4</td><td>$48</td></tr>
+    <tr><td>K. Ndlovu - Fit</td><td>3</td><td>$35</td></tr>
+  </table>
+</div>
+
+<div style="text-align:center;margin:20px">
+  <a href="index.html" style="color:#888">Home</a> | 
+  <a href="shofe-passenger.html" style="color:#888">Passenger</a> | 
+  <a href="shofe-driver.html" style="color:#888">Driver</a>
+</div>
+
+<script>
+function loadAdmin(){
+  let jobs=JSON.parse(localStorage.getItem('shofe_jobs')||'[]');
+  let total=0, comm=0, open=0;
+  let html="";
+  jobs.slice().reverse().forEach(j=>{
+    let cut=(Number(j.bid)*0.2).toFixed(2);
+    total+=Number(j.bid); comm+=Number(cut); if(j.status=='open') open++;
+    html+=`<tr><td>${j.time||''}</td><td>${j.pickup} → ${j.dropoff}<br><small style="color:#888">${j.type}</small></td><td>$${j.bid}</td><td style="color:#00c853">$${cut}</td><td><span class="badge ${j.status}">${j.status}</span></td><td><button class="btn del" onclick="delJob(${j.id})">X</button></td></tr>`;
+  });
+  document.getElementById('jobsTable').innerHTML=html||'<tr><td colspan="6" style="text-align:center;color:#888">No jobs - Book a ride from passenger page</td></tr>';
+  document.getElementById('totalRides').innerText=jobs.length;
+  document.getElementById('today').innerText="$"+total.toFixed(2);
+  document.getElementById('totalComm').innerText="$"+comm.toFixed(2);
+  document.getElementById('openJobs').innerText=open;
+}
+
+function delJob(id){
+  let jobs=JSON.parse(localStorage.getItem('shofe_jobs')||'[]').filter(j=>j.id!=id);
+  localStorage.setItem('shofe_jobs', JSON.stringify(jobs));
+  loadAdmin();
+}
+function clearAll(){ if(confirm("Clear all rides?")){ localStorage.removeItem('shofe_jobs'); loadAdmin(); } }
+function seedDemo(){
+  let demo=[
+    {id:Date.now(), pickup:"Avondale", dropoff:"CBD", bid:10, type:"Economy", status:"open", time:"14:23"},
+    {id:Date.now()+1, pickup:"Borrowdale", dropoff:"Airport", bid:25, type:"Comfort", status:"accepted", time:"13:10"},
+    {id:Date.now()+2, pickup:"Mt Pleasant", dropoff:"Sam Levy", bid:8, type:"Economy", status:"open", time:"12:45"},
+  ];
+  localStorage.setItem('shofe_jobs', JSON.stringify(demo));
+  loadAdmin();
+}
+loadAdmin();
+setInterval(loadAdmin,2000);
+</script>
+</body>
+</html>
