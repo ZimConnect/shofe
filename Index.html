@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#06140d">
+<title>Shofe v6 ULTIMATE Google Maps $0.38/km Courier Roadside Night Owl</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=PASTE_YOUR_GOOGLE_MAPS_API_KEY_HERE&libraries=places,geometry"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;background:#03100a;color:#fff;overflow:hidden}
+.page{display:none;height:100vh;flex-direction:column;max-width:960px;margin:auto;padding:12px 16px;overflow-y:auto}.page.active{display:flex}
+.topbar{height:56px;display:flex;align-items:center;justify-content:space-between}.icon-btn{width:44px;height:44px;border-radius:14px;background:rgba(0,0,0,.5);color:#fff;font-size:20px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.08);cursor:pointer}
+.hero{text-align:center;padding:8px 0}.logo-wrap{width:110px;height:110px;margin:0 auto 8px;border-radius:24px;background:#0a2218;display:grid;place-items:center;font-size:60px;overflow:hidden;border:1px solid #143}
+.actions{display:grid;gap:10px;flex:1;margin-top:12px}.action{position:relative;width:100%;min-height:78px;border-radius:20px;padding:14px 50px 14px 68px;color:#fff;text-align:left;display:flex;flex-direction:column;justify-content:center;cursor:pointer;border:0}
+.action-icon{position:absolute;left:18px;top:50%;transform:translateY(-50%);font-size:32px}.action h2{font-size:15px;font-weight:900}.action p{font-size:12px;opacity:.9}.arrow{position:absolute;right:18px;top:50%;transform:translateY(-50%);font-size:26px}
+.ride{background:linear-gradient(90deg,#00c853,#00a844)}.drive{background:linear-gradient(90deg,#1685e8,#0966c8)}.courier{background:linear-gradient(90deg,#00bfa5,#008e76)}.roadside{background:linear-gradient(90deg,#ff8500,#ff5f00)}.night{background:linear-gradient(90deg,#8d2bd4,#6514a5)}.admin{background:linear-gradient(90deg,#111,#333)}.wallet{background:linear-gradient(90deg,#FFD700,#FFA500);color:#000}
+.map-box{flex:1;border-radius:18px;overflow:hidden;margin:8px 0;background:#111;min-height:320px;position:relative}
+#map,#mapDriver,#mapRoad,#mapNight,#mapCourier,#gmap,#gmapDriver,#gmapRoad,#gmapNight,#gmapCourier{width:100%;height:100%;min-height:320px}
+.map-toggle{position:absolute;top:10px;right:10px;z-index:1000;background:#000;color:#fff;padding:8px 12px;border-radius:20px;font-size:11px;border:1px solid #333;cursor:pointer}
+.card{background:#0e2018;border:1px solid rgba(0,217,90,.15);border-radius:16px;padding:14px;margin:8px 0}.input{width:100%;padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:#07140e;color:#fff;margin:6px 0;font-size:14px}
+.btn-main{width:100%;padding:16px;border-radius:14px;font-weight:900;font-size:15px;margin-top:8px;color:#fff;cursor:pointer;border:0}.btn-green{background:linear-gradient(90deg,#00c853,#00a844);color:#000}.btn-blue{background:linear-gradient(90deg,#1685e8,#0966c8)}.btn-teal{background:linear-gradient(90deg,#00bfa5,#008e76);color:#000}.btn-orange{background:linear-gradient(90deg,#ff8500,#ff5f00);color:#000}.btn-purple{background:linear-gradient(90deg,#8d2bd4,#6514a5)}.btn-gold{background:linear-gradient(90deg,#FFD700,#FFA500);color:#000}
+.live-btn{width:180px;height:180px;border-radius:50%;border:0;font-size:20px;font-weight:900;margin:15px auto;display:block;cursor:pointer}.live-off{background:#d71920;color:#fff}.live-on{background:#00c853;color:#fff;box-shadow:0 0 40px #00c853}
+.badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(0,217,90,.15);color:#65e994}
+.wallet-card{background:linear-gradient(135deg,#0e2018,#1a3d2a);border:1px solid #FFD700;border-radius:16px;padding:16px;margin:8px 0}
+.calc{background:#07140e;border:1px solid #FFD700;border-radius:12px;padding:12px;margin:8px 0}.footer{text-align:center;color:#5a6a64;font-size:10px;margin-top:10px}
+table{width:100%;border-collapse:collapse;font-size:13px}th{color:#888;text-align:left;padding:8px}td{padding:10px 8px;border-top:1px solid #222}.paybox{background:#13251c;border:1px dashed #2a6b45;padding:10px;border-radius:10px;margin-top:8px;font-size:13px}
+.upload{display:flex;align-items:center;justify-content:space-between;padding:12px;background:#13251c;border-radius:10px;margin:8px 0;border:1px solid #1a3d2a}.upload img,.upload video{width:72px;height:72px;border-radius:8px;object-fit:cover;background:#000}.btn-cam{padding:8px 12px;background:#00c853;color:#000;border-radius:8px;font-weight:700;border:0;font-size:12px;cursor:pointer}
+.job{background:#13251c;padding:12px;border-radius:10px;margin:8px 0;border-left:4px solid #00c853}
+</style>
+</head>
+<body>
+<div id="p-landing" class="page active">
+<div class="topbar"><button class="icon-btn" onclick="showPage('p-admin')">👑</button><span class="badge">v6 ULTIMATE Google Maps $0.38/km</span><button class="icon-btn" onclick="showPage('p-wallet')">💳</button></div>
+<div class="hero"><div class="logo-wrap"><img src="shofe-rider.png" onerror="this.style.display='none'"><span>🚕</span></div><h1>SHOFE</h1><p>ULTIMATE GOOGLE MAPS $0.38/KM COURIER ROADSIDE NIGHT OWL</p></div>
+<div class="wallet-card"><div style="display:flex;justify-content:space-between"><div><small>PASSENGER WALLET</small><h2 id="walletPassenger">$150.00 USD</h2></div><div style="text-align:right"><small>DRIVER 85%</small><h2 id="walletDriver">$0.00 USD</h2></div></div></div>
+<div class="actions">
+<button class="action ride" onclick="showPage('p-passenger')"><span class="action-icon">🚕</span><h2>I NEED A RIDE $0.38/km</h2><p>Google Maps Distance Base $2 + $0.38/km Instant Pay</p><span class="arrow">›</span></button>
+<button class="action courier" onclick="showPage('p-courier')"><span class="action-icon">📦</span><h2>COURIER Bike Truck Google Maps</h2><p>Bike $3 + $0.50/km Pickup $15 + $1.20/km 3-Ton $40 + $2.50/km 7-Ton $80 + $4.00/km</p><span class="arrow">›</span></button>
+<button class="action drive" onclick="showPage('p-driver')"><span class="action-icon">🚗</span><h2>I WANT TO DRIVE 15% Commission</h2><p>Earn 85% to Apple Pay InnBucks TeleCash OneMoney EcoCash Bank Nostro</p><span class="arrow">›</span></button>
+<button class="action roadside" onclick="showPage('p-roadside')"><span class="action-icon">🔧</span><h2>ROADSIDE ASSISTANCE Google Maps</h2><p>Tow Tyre Fuel Battery Lockout $0.38/km Google Maps</p><span class="arrow">›</span></button>
+<button class="action night" onclick="showPage('p-night')"><span class="action-icon">🌙</span><h2>NIGHT OWL Drive My Car Home Google Maps</h2><p>$20 base + $1/km Google Maps Tracking 85% to driver wallet</p><span class="arrow">›</span></button>
+<button class="action wallet" onclick="showPage('p-wallet')"><span class="action-icon">💳</span><h2>WALLET VIRTUAL PAY</h2><p>Apple Pay InnBucks TeleCash OneMoney EcoCash Bank Nostro Instant Deduct</p><span class="arrow">›</span></button>
+<button class="action admin" onclick="showPage('p-admin')"><span class="action-icon">👑</span><h2>BOSS ADMIN v6</h2><p>Google Maps Revenue 15% Rides Couriers Roadside Night Owl</p><span class="arrow">›</span></button>
+</div>
+<div class="footer">© 2026 Shofe v6 ULTIMATE Google Maps $0.38/km lloyd.tewe@shoferider.com shoferider.com</div>
+</div>
+<div id="p-wallet" class="page">
+<div class="topbar"><button class="icon-btn" onclick="showPage('p-landing')">‹</button><h3>💳 Wallet v6</h3><span class="badge" id="walletBadge">$150</span></div>
+<div class="wallet-card"><h3>👤 Passenger Wallets Instant Deduct Google Maps</h3>
+<select id="passengerPayMethod" class="input"><option value="ecocash">EcoCash $150</option><option value="onemoney">OneMoney $80</option><option value="telecash">TeleCash $45</option><option value="omari">O'Mari $120</option><option value="innbucks">InnBucks $60</option><option value="applepay">Apple Pay $200 USD</option><option value="bank_nostro">Nostro USD $350 USD</option><option value="bank_zig">Bank ZiG $2500 ZiG</option><option value="cash_usd">Cash USD</option></select>
+<div style="display:flex;gap:8px"><input id="topupAmount" class="input" type="number" placeholder="Top up $"><button class="btn-main btn-gold" style="width:120px" onclick="topupWallet()">Top Up</button></div>
+<div class="calc"><div style="display:flex;justify-content:space-between"><span>Current:</span><b id="walletCurrent">$150.00</b></div><div style="display:flex;justify-content:space-between"><span>Last:</span><b id="walletLastDeduction">-$0.00</b></div><div style="display:flex;justify-content:space-between;font-size:18px;border-top:1px solid #FFD700;margin-top:8px;padding-top:8px"><span>Available:</span><b id="walletAvail" style="color:#FFD700">$150.00</b></div></div>
+</div>
+<div class="wallet-card" style="border-color:#00c853"><h3>🚗 Driver Earnings 85% Instant</h3><select id="driverPayoutMethod" class="input"><option value="ecocash">EcoCash 85%</option><option value="applepay">Apple Pay 85% USD</option><option value="innbucks">InnBucks 85%</option><option value="bank_nostro">Nostro USD 85%</option></select><div style="display:flex;justify-content:space-between"><span>Total:</span><b id="driverTotalEarn">$0.00</b></div><button class="btn-main btn-blue" onclick="cashoutDriver()">Cashout 85%</button></div>
+<button class="btn-main" style="background:#222" onclick="showPage('p-landing')">Back Home</button>
+</div>
+<div id="p-passenger" class="page">
+<div class="topbar"><button class="icon-btn" onclick="showPage('p-landing')">‹</button><h3>🚕 Ride $0.38/km Google Maps</h3><span class="badge">Google Maps $0.38/km</span></div>
+<div class="map-box"><div id="map"></div><div id="gmap" style="display:none"></div><button class="map-toggle" onclick="toggleMap('map','gmap')">🗺️ Google/OSM</button></div>
+<div class="card">
+<input id="from" class="input" placeholder="Pickup Joina City Google Autocomplete">
+<input id="to" class="input" placeholder="Dropoff Borrowdale Google Maps Distance">
+<div style="display:flex;gap:8px"><input id="distance" class="input" type="number" placeholder="Distance km auto Google" oninput="calcRideFare()"><button class="btn-main" style="width:120px;background:#222" onclick="calcGoogleDistance()">📏 Google Distance</button><select id="rideType" class="input" onchange="calcRideFare()"><option value="Economy" data-base="2">Economy $2 base</option><option value="Comfort" data-base="3">Comfort $3</option><option value="XL" data-base="5">XL $5</option></select></div>
+<div class="calc"><div style="display:flex;justify-content:space-between"><span>Base:</span><b id="rideBase">$2.00</b></div><div style="display:flex;justify-content:space-between"><span>Distance Google (<span id="rideKm">0</span>km × $0.38):</span><b id="rideDist">$0.00</b></div><div style="display:flex;justify-content:space-between;font-size:18px;border-top:1px solid #FFD700;margin-top:8px;padding-top:8px"><span>Total Fare:</span><b id="rideTotal" style="color:#FFD700">$0.00</b></div><div style="display:flex;justify-content:space-between;font-size:12px;color:#aaa"><span>Driver Gets 85%:</span><b id="rideDriverPay">$0.00 → Wallet</b></div><div style="display:flex;justify-content:space-between;font-size:12px;color:#888"><span>Shofe 15% Fee:</span><b id="ridePlatformFee">$0.00</b></div></div>
+<select id="pay" class="input"><option value="ecocash">EcoCash Instant</option><option value="applepay">Apple Pay Instant</option><option value="innbucks">InnBucks Instant</option><option value="bank_nostro">Nostro USD Instant</option><option value="cash_usd">Cash USD</option></select>
+<button class="btn-main btn-green" onclick="requestRide()">REQUEST SHOFE $0.38/km Google Maps PAY INSTANT</button>
+<p id="rideStatus" style="text-align:center;color:#65e994"></p>
+</div>
+</div>
+<div id="p-driver" class="page">
+<div class="topbar"><button class="icon-btn" onclick="showPage('p-landing')">‹</button><h3>🚗 Driver PRO Google Maps 15%</h3><span class="badge" id="onlineBadge">Offline</span></div>
+<div class="map-box"><div id="mapDriver"></div><div id="gmapDriver" style="display:none"></div><button class="map-toggle" onclick="toggleMap('mapDriver','gmapDriver')">🗺️ Google/OSM</button></div>
+<div class="wallet-card"><div style="display:flex;justify-content:space-between"><span>Driver Wallet 85%:</span><b id="driverWalletBalance" style="color:#00c853">$0.00 USD</b></div><button class="btn-main btn-blue" onclick="cashoutDriver()">💸 Cashout 85%</button></div>
