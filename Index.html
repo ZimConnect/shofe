@@ -76,3 +76,55 @@ table{width:100%;border-collapse:collapse;font-size:13px}th{color:#888;text-alig
 <div class="topbar"><button class="icon-btn" onclick="showPage('p-landing')">‹</button><h3>🚗 Driver PRO Google Maps 15%</h3><span class="badge" id="onlineBadge">Offline</span></div>
 <div class="map-box"><div id="mapDriver"></div><div id="gmapDriver" style="display:none"></div><button class="map-toggle" onclick="toggleMap('mapDriver','gmapDriver')">🗺️ Google/OSM</button></div>
 <div class="wallet-card"><div style="display:flex;justify-content:space-between"><span>Driver Wallet 85%:</span><b id="driverWalletBalance" style="color:#00c853">$0.00 USD</b></div><button class="btn-main btn-blue" onclick="cashoutDriver()">💸 Cashout 85%</button></div>
+  <div class="card" id="verifyCard"><h3>✅ Verification Bike Car Truck</h3><div class="upload"><div><b>Licence</b><br><small id="licenceStatus">Not taken</small></div><video id="licenceVideo" autoplay playsinline style="display:none"></video><img id="licenceImg" style="display:none"><button class="btn-cam" onclick="takePhoto('licence')">Photo</button></div><div class="upload"><div><b>Selfie</b><br><small id="selfieStatus">Not taken</small></div><video id="selfieVideo" autoplay playsinline style="display:none"></video><img id="selfieImg" style="display:none"><button class="btn-cam" onclick="takePhoto('selfie')">Selfie</button></div><select id="driverVehicleType" class="input"><option>Car $0.38/km</option><option>Bike $0.50/km</option><option>Pickup $1.20/km</option><option>3-Ton $2.50/km</option><option>7-Ton $4.00/km</option></select><button class="btn-main" style="background:#1685e8" onclick="submitVerification()">SUBMIT</button><p id="verifyStatus" style="text-align:center;color:#65e994"></p></div>
+<button id="liveBtn" class="live-btn live-off" onclick="toggleLive()">GO LIVE Earn 85% Google Maps</button>
+<div id="statusText" style="text-align:center">OFFLINE</div>
+<div id="jobsCard" class="card" style="display:none"><h3>🔔 INCOMING JOBS Google Maps 85% to You</h3><div id="jobsList">Waiting for $0.38/km rides courier bike/truck roadside night owl...</div></div>
+</div>
+<div id="p-courier" class="page">
+<div class="topbar"><button class="icon-btn" onclick="showPage('p-landing')">‹</button><h3>📦 Courier PRO Google Maps</h3><span class="badge">Bike Truck Google Maps</span></div>
+<div class="map-box"><div id="mapCourier"></div><div id="gmapCourier" style="display:none"></div><button class="map-toggle" onclick="toggleMap('mapCourier','gmapCourier')">🗺️ Google/OSM</button></div>
+<div class="card">
+<input id="cFrom" class="input" placeholder="Pickup Google Maps">
+<input id="cTo" class="input" placeholder="Dropoff 5637 West Rd Chiredzi Google Maps">
+<div style="display:flex;gap:8px"><select id="cVehicle" class="input" onchange="calcCourierPrice()"><option value="Bike" data-base="3" data-km="0.5">Bike 10kg $3 + $0.50/km</option><option value="Car" data-base="5" data-km="0.8">Car 50kg $5 + $0.80/km</option><option value="Pickup" data-base="15" data-km="1.2">Pickup 500kg $15 + $1.20/km</option><option value="3-Ton" data-base="40" data-km="2.5">3-Ton $40 + $2.50/km</option><option value="7-Ton" data-base="80" data-km="4.0">7-Ton $80 + $4.00/km</option></select><input id="cWeight" class="input" type="number" placeholder="kg" oninput="calcCourierPrice()"></div>
+<div style="display:flex;gap:8px"><input id="cDistance" class="input" type="number" placeholder="Distance km Google Maps" oninput="calcCourierPrice()"><select id="cParcel" class="input"><option>Documents</option><option>Food</option><option>Furniture</option><option>Building</option><option>Other</option></select></div>
+<input id="cPhone" class="input" type="tel" placeholder="Receiver +263">
+<div class="calc"><div style="display:flex;justify-content:space-between"><span>Base:</span><b id="calcBase">$0</b></div><div style="display:flex;justify-content:space-between"><span>Distance Google (<span id="calcKm">0</span>km × $<span id="calcRate">0</span>):</span><b id="calcDist">$0</b></div><div style="display:flex;justify-content:space-between"><span>Weight:</span><b id="calcWeight">$0</b></div><div style="display:flex;justify-content:space-between;font-size:18px;border-top:1px solid #FFD700;margin-top:8px;padding-top:8px"><span>TOTAL:</span><b id="calcTotal" style="color:#FFD700">$0</b></div><div style="display:flex;justify-content:space-between;font-size:12px;color:#aaa"><span>Driver Gets 85%:</span><b id="calcDriver">$0</b></div><div style="display:flex;justify-content:space-between;font-size:12px;color:#888"><span>Shofe 15%:</span><b id="calcPlatform">$0</b></div></div>
+<div style="display:flex;gap:8px"><select id="cPay" class="input"><option value="ecocash">EcoCash Instant</option><option value="applepay">Apple Pay Instant</option><option value="innbucks">InnBucks Instant</option><option value="bank_nostro">Nostro USD Instant</option><option value="cash_usd">Cash USD</option></select><input id="cBid" class="input" type="number" placeholder="Offer $ auto"></div>
+<div style="display:flex;gap:8px"><button class="btn-main" style="background:#222" onclick="calcGoogleDistanceCourier()">📏 Google Distance Courier</button><button class="btn-main" style="background:#222" onclick="locateMe('mapCourier')">📍 GPS</button></div>
+<button class="btn-main btn-teal" onclick="requestCourier()">REQUEST COURIER Google Maps 85% to Driver Wallet</button>
+<p id="cStatus" style="text-align:center;color:#00e5b8"></p>
+</div>
+</div>
+<div id="p-roadside" class="page">
+<div class="topbar"><button class="icon-btn" onclick="showPage('p-landing')">‹</button><h3>🔧 Roadside Google Maps</h3><span class="badge">Google Maps $0.38/km</span></div>
+<div class="map-box"><div id="mapRoad"></div><div id="gmapRoad" style="display:none"></div><button class="map-toggle" onclick="toggleMap('mapRoad','gmapRoad')">🗺️ Google/OSM</button></div>
+<div class="card">
+<input id="rLocation" class="input" placeholder="📍 Your Location Google Maps">
+<select id="rProblem" class="input"><option>Flat Tire</option><option>Dead Battery</option><option>Out of Fuel</option><option>Towing</option><option>Locked Out</option></select>
+<input id="rCar" class="input" placeholder="🚗 Car">
+<div style="display:flex;gap:8px"><input id="rDistance" class="input" type="number" placeholder="Distance km Google"><input id="rBid" class="input" type="number" placeholder="Fare auto $0.38/km"></div>
+<select id="rPay" class="input"><option value="ecocash">EcoCash Instant</option><option value="applepay">Apple Pay Instant</option><option value="innbucks">InnBucks Instant</option><option value="bank_nostro">Nostro USD</option></select>
+<button class="btn-main btn-orange" onclick="requestRoadside()">REQUEST ROADSIDE Google Maps 85% to Driver Wallet</button>
+<p id="rStatus" style="text-align:center;color:#ffa500"></p>
+</div>
+</div>
+<div id="p-night" class="page">
+<div class="topbar"><button class="icon-btn" onclick="showPage('p-landing')">‹</button><h3>🌙 Night Owl Google Maps</h3><span class="badge">$20 + $1/km Google Maps</span></div>
+<div class="map-box"><div id="mapNight"></div><div id="gmapNight" style="display:none"></div><button class="map-toggle" onclick="toggleMap('mapNight','gmapNight')">🗺️ Google/OSM</button></div>
+<div class="card">
+<div style="background:#2a1a3a;border-left:4px solid #8d2bd4;padding:12px;border-radius:8px;margin-bottom:12px;font-size:13px"><b>How it works:</b> Had drinks? We drive YOUR car home safely. Google Maps tracks driver. 24/7 Harare. $20 base + $1/km. 85% to driver wallet Apple Pay InnBucks Nostro.</div>
+<input id="nPickup" class="input" placeholder="📍 Where are you? Club 1Eighty Google Maps">
+<input id="nDropoff" class="input" placeholder="🏠 Home Borrowdale Google Maps">
+<input id="nCar" class="input" placeholder="🚗 Car Details">
+<input id="nPhone" class="input" type="tel" placeholder="📞 Your Number +263">
+<input id="nDistance" class="input" type="number" placeholder="Distance km Google Maps auto">
+<select id="nPay" class="input"><option value="ecocash">EcoCash Instant</option><option value="applepay">Apple Pay Instant</option><option value="innbucks">InnBucks Instant</option><option value="bank_nostro">Nostro USD Instant</option></select>
+<button class="btn-main btn-purple" onclick="requestNightOwl()">BOOK NIGHT OWL Google Maps 85% to Driver</button>
+<p id="nStatus" style="text-align:center;color:#d48fff"></p>
+</div>
+</div>
+<div id="p-admin" class="page">
+<div class="topbar"><button class="icon-btn" onclick="showPage('p-landing')">‹</button><h3>👑 Admin v6 ULTIMATE Google Maps</h3><b id="todayTotal" style="color:#FFD700">$0</b></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div class="card" style="text-align:center;margin:0"><b id="totalRides" style="font-size:24px;display:block;color:#FFD700">0</b><small>Total Jobs Ride+Courier+Roadside+Night Owl</small></div><div class="card" style="text-align:center;margin:0"><b id="totalComm" style="font-size:24px;display:block;color:#00c853">0</b><small>Shofe 15% Cut</small></div
