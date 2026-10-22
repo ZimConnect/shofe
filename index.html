@@ -1,1 +1,59 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#06140d">
+<title>Shofe - Zimbabwe Ride & Help App - $0.38/km - Points Free Ride 40km</title>
+<link rel="icon" href="shofe-logo.png">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://maps.googleapis.com/maps/api/js?key=PASTE_YOUR_GOOGLE_MAPS_API_KEY_HERE&libraries=places,geometry"></script>
+<style>
+:root{--bg:#03100a;--panel:#0e2018;--green:#00c853;--gold:#ffd700;--muted:#9bb0a5;--pink:#ff2d7b}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,Arial,sans-serif;background:var(--bg);color:#fff}body{overflow-x:hidden}
+.page{display:none;min-height:100vh;max-width:980px;margin:auto;padding:12px 16px 28px;flex-direction:column}.page.active{display:flex}
+.topbar{min-height:58px;display:flex;align-items:center;justify-content:space-between;gap:8px}.icon-btn{width:46px;height:46px;flex:0 0 46px;border-radius:14px;background:#10231a;color:#fff;font-size:22px;border:1px solid #294234;display:grid;place-items:center;cursor:pointer}
+.badge{display:inline-block;padding:6px 12px;border-radius:20px;font-size:11px;font-weight:900;background:#123523;color:#80f5a9}
+.hero{text-align:center;padding:10px 0}.logo-wrap{width:110px;height:110px;margin:0 auto 8px;border-radius:26px;background:#0a2218;border:1px solid #1e4930;display:grid;place-items:center;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.4)}.logo-wrap img{width:100%;height:100%;object-fit:contain;padding:6px}.hero h1{margin:6px 0 2px;font-size:42px;letter-spacing:4px;font-weight:900}.hero p{color:#65e994;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px}
+.wallet-card,.card{background:var(--panel);border:1px solid #1e4930;border-radius:18px;padding:14px;margin:9px 0}.wallet-card{background:linear-gradient(135deg,#0e2018,#1a3d2a);border-color:var(--gold);position:relative;overflow:hidden}
+.points-card{background:linear-gradient(135deg,#1a0e2a,#2a1a3a);border:2px solid #8d2bd4;border-radius:18px;padding:16px;margin:10px 0;position:relative}.points-progress{height:10px;background:#2a2a2a;border-radius:20px;overflow:hidden;margin:10px 0}.points-fill{height:100%;background:linear-gradient(90deg,#8d2bd4,#ff2d7b);border-radius:20px;transition:width .6s}
+.actions{display:grid;gap:12px;margin-top:14px}.action{position:relative;width:100%;min-height:82px;border-radius:20px;padding:14px 48px 14px 70px;color:white;text-align:left;display:flex;flex-direction:column;justify-content:center;border:0;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.25)}.action h2{font-size:15px;margin:0 0 4px;font-weight:900}.action p{font-size:12px;margin:0;opacity:.95}.action-icon{position:absolute;left:18px;font-size:34px}.arrow{position:absolute;right:16px;font-size:24px;opacity:.8}
+.ride{background:linear-gradient(135deg,#00c853,#008b3a)}.drive{background:linear-gradient(135deg,#1685e8,#0966c8)}.courier{background:linear-gradient(135deg,#00bfa5,#008e76)}.roadside{background:linear-gradient(135deg,#ff8500,#d94b00)}.night{background:linear-gradient(135deg,#8d2bd4,#6514a5)}.admin{background:linear-gradient(135deg,#222,#444)}.wallet{background:linear-gradient(135deg,#ffd700,#ffa500);color:#111}
+.input{width:100%;padding:14px;border-radius:12px;border:1px solid #294234;background:#07140e;color:#fff;margin:5px 0;font-size:14px}.row{display:flex;gap:8px}.row>*{flex:1;min-width:0}
+.btn-main{width:100%;padding:15px;border-radius:14px;font-weight:900;margin-top:8px;color:white;border:0;cursor:pointer;font-size:14px}.btn-green{background:linear-gradient(90deg,#00c853,#00a844);color:#001b09}.btn-blue{background:linear-gradient(90deg,#1685e8,#0966c8)}.btn-teal{background:linear-gradient(90deg,#00bfa5,#008e76);color:#001a15}.btn-orange{background:linear-gradient(90deg,#ff8500,#d94b00)}.btn-purple{background:linear-gradient(90deg,#8d2bd4,#6514a5)}.btn-gold{background:linear-gradient(90deg,#ffd700,#ffa500);color:#111}.btn-dark{background:#1e2a22}.btn-pink{background:linear-gradient(90deg,#ff2d7b,#8d2bd4);color:white}
+.calc{background:#07140e;border:1px solid #a98e00;border-radius:14px;padding:14px;margin:10px 0}.calc div{display:flex;justify-content:space-between;padding:4px 0;gap:10px}
+.map-box{height:300px;border-radius:18px;overflow:hidden;margin:10px 0;background:#102018;position:relative;border:1px solid #1e4930}.map{width:100%;height:100%}.map-toggle{position:absolute;top:10px;right:10px;z-index:1000;background:rgba(0,0,0,.8);color:#fff;padding:7px 12px;border-radius:20px;font-size:11px;border:1px solid #444;cursor:pointer}
+.footer{text-align:center;color:#72877b;font-size:11px;margin-top:20px;line-height:1.5}.status{color:#80f5a9;text-align:center;font-size:13px;min-height:20px;margin-top:8px}.small{font-size:12px;color:#9bb0a5}
+.live-btn{width:170px;height:170px;border-radius:50%;border:0;font-size:18px;font-weight:900;margin:16px auto;display:block;cursor:pointer}.live-off{background:#c91c28;color:white}.live-on{background:#00c853;color:#001b09;box-shadow:0 0 32px #00c853}
+.job{background:#13251c;padding:14px;border-radius:12px;margin:10px 0;border-left:4px solid #00c853}
+</style>
+</head>
+<body>
+<section id="p-landing" class="page active">
+ <div class="topbar"><button class="icon-btn" onclick="showPage('p-admin')">👑</button><span class="badge">v7 • GOOGLE MAPS • POINTS • FREE RIDE 40KM</span><button class="icon-btn" onclick="showPage('p-wallet')">💳</button></div>
+ <div class="hero">
+  <div class="logo-wrap"><img src="shofe-logo.png" alt="Shofe Logo" onerror="this.style.display='none';this.parentElement.innerHTML='🚕'"></div>
+  <h1>SHOFE</h1>
+  <p>Zimbabwe's Ride & Help App • $0.38/km • Points Rewards</p>
+ </div>
+ <div class="wallet-card">
+  <div class="row"><div><small>PASSENGER BALANCE</small><h2 id="walletPassenger">$150.00</h2><small>EcoCash • Moneyless = Points</small></div><div style="text-align:right"><small>DRIVER EARNINGS 85%</small><h2 id="walletDriver">$0.00</h2><small>Apple Pay • InnBucks • Nostro</small></div></div>
+ </div>
+ <div class="points-card">
+  <div style="display:flex;justify-content:space-between;align-items:center"><div><small style="color:#d48fff;font-weight:900">SHOFE POINTS REWARDS</small><h2 style="font-size:28px;margin:4px 0"><span id="pointsBalance">0</span> ⭐ Points</h2><small style="color:#aaa">Earn 10 points per $1 on moneyless trips</small></div><div style="text-align:right"><div style="font-size:40px">🎁</div><small style="color:#ff2d7b;font-weight:800">FREE RIDE</small></div></div>
+  <div class="points-progress"><div id="pointsProgress" class="points-fill" style="width:0%"></div></div>
+  <div style="display:flex;justify-content:space-between;font-size:12px"><span><span id="pointsToFree">400</span> points to FREE RIDE up to 40km</span><span style="color:#ff2d7b;font-weight:900"><span id="pointsPercent">0</span>%</span></div>
+  <div style="display:flex;gap:8px;margin-top:12px"><button class="btn-main btn-pink" style="flex:1;padding:10px;font-size:12px" onclick="redeemFreeRide()">🎁 Redeem 400 Points = Free Ride UpTo 40km</button><button class="btn-main btn-dark" style="flex:1;padding:10px;font-size:12px" onclick="showPage('p-wallet')">💳 View Points History</button></div>
+  <small class="small" style="display:block;margin-top:8px;color:#d48fff">💡 Commission still goes to driver even on free rides — Shofe pays driver from points pool. Moneyless = More points = Free rides!</small>
+ </div>
+ <div class="actions">
+  <button class="action ride" onclick="showPage('p-passenger')"><span class="action-icon">🚕</span><h2>I NEED A RIDE - Google Maps + Points</h2><p>$2 base + $0.38/km • Earn 10⭐ per $1 on EcoCash/Apple Pay • Free ride at 400⭐</p><span class="arrow">›</span></button>
+  <button class="action courier" onclick="showPage('p-courier')"><span class="action-icon">📦</span><h2>COURIER & TRUCKS - Bike to 7-Ton</h2><p>Bike $3+$0.50/km • Pickup $15+$1.20/km • 3-Ton $40+$2.50/km • Google Maps + Points</p><span class="arrow">›</span></button>
+  <button class="action drive" onclick="showPage('p-driver')"><span class="action-icon">🚗</span><h2>I WANT TO DRIVE - Earn 85% + Points Bonus</h2><p>Bike Car Pickup 3-Ton 7-Ton • 85% to Apple Pay InnBucks EcoCash Bank Nostro USD</p><span class="arrow">›</span></button>
+  <button class="action roadside" onclick="showPage('p-roadside')"><span class="action-icon">🔧</span><h2>ROADSIDE ASSISTANCE - Google Maps</h2><p>Flat Tyre Battery Fuel Towing • $0.38/km • Earn Points on Moneyless Pay</p><span class="arrow">›</span></button>
+  <button class="action night" onclick="showPage('p-night')"><span class="action-icon">🌙</span><h2>NIGHT OWL - Drive My Car Home - Google Maps</h2><p>$20 base + $1/km • Google Maps • 85% to driver • Points for cashless</p><span class="arrow">›</span></button>
+  <button class="action wallet" onclick="showPage('p-wallet')"><span class="action-icon">💳</span><h2>WALLET & POINTS - Free Ride 40km</h2><p>Apple Pay InnBucks EcoCash Bank Nostro • Points History • Redeem Free Ride UpTo 40km</p><span class="arrow">›</span></button>
+  <button class="action admin" onclick="showPage('p-admin')"><span class="action-icon">👑</span><h2>BOSS ADMIN v7</h2><p>Google Maps • Revenue 15% • Drivers 85% • Points Issued • Free Rides 40km</p><span class="arrow">›</span></button>
+ </div>
+ <div class="footer">© 2026 Shofe v7 • Google Maps • $0.38/km • 85% to Driver • Points → Free Ride 40km<br>shoferider.com • lloyd.tewe@shoferider.com<br>Logo: shofe-logo.png in root • File must be named index.html</div>
+</section>
