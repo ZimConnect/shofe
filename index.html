@@ -94,3 +94,113 @@
  <button id="liveBtn" class="live-btn live-off" onclick="toggleLive()">GO LIVE 85% + Points Bonus</button><div id="statusText" class="status">OFFLINE</div>
  <div class="card"><h3>Available jobs - Google Maps - 85% to you even on free rides</h3><div id="jobsList"></div></div>
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  </section>
+<section id="p-wallet" class="page">
+ <div class="topbar"><button class="icon-btn" onclick="showPage('p-landing')">‹</button><h3>💳 Wallet & Points - Free Ride 40km</h3><span class="badge" id="walletBadge">0⭐</span></div>
+ <div class="points-card">
+  <h3>⭐ Points Rewards - Free Ride UpTo 40km</h3>
+  <div style="display:flex;justify-content:space-between"><div><h2 style="font-size:36px"><span id="pointsWallet">0</span> ⭐</h2><small>Moneyless transactions only</small></div><div style="text-align:right"><h3>400 ⭐ = FREE RIDE</h3><small>Up to 40km • $0.38/km • Driver still gets 85%</small></div></div>
+  <div class="points-progress"><div id="pointsProgressWallet" class="points-fill" style="width:0%"></div></div>
+  <div style="display:flex;justify-content:space-between;font-size:12px;margin-top:8px"><span id="pointsNext">400 more to free ride</span><span id="pointsFreeEligible" style="color:#ff2d7b;font-weight:900;display:none">🎁 ELIGIBLE FOR FREE RIDE 40km!</span></div>
+  <button class="btn-main btn-pink" onclick="redeemFreeRide()">🎁 Redeem 400 Points = Free Ride UpTo 40km</button>
+  <div class="card" style="background:#1a1a1a;margin-top:12px"><h4>How Points Work:</h4><p class="small">• Pay with EcoCash, Apple Pay, InnBucks, Bank Nostro USD, OneMoney, TeleCash = Moneyless transaction<br>• Earn 10 points per $1 spent<br>• Cash USD = No points (to encourage moneyless)<br>• 400 points = Free ride up to 40km (40km × $0.38 = $15.20 value)<br>• Commission still goes to driver 85% even on free ride — Shofe pays driver from points pool<br>• More points = More free rides — No expiry</p></div>
+  <div id="pointsHistory" style="margin-top:12px"></div>
+ </div>
+ <div class="wallet-card"><h3>Passenger Balance (Demo)</h3><h2 id="walletCurrent">$150.00</h2><select id="passengerPayMethod" class="input"><option>EcoCash — Moneyless + Points</option><option>Apple Pay — Moneyless + Points</option><option>InnBucks — Moneyless + Points</option><option>Bank Nostro USD — Moneyless + Points</option><option>Cash USD — No Points</option></select><div class="row"><input id="topupAmount" class="input" type="number" placeholder="Top-up demo"><button class="btn-main btn-gold" onclick="topupWallet()">Add Funds</button></div></div>
+ <button class="btn-main btn-dark" onclick="showPage('p-landing')">Back Home - Clickable Landing</button>
+</section>
+
+<section id="p-admin" class="page">
+ <div class="topbar"><button class="icon-btn" onclick="showPage('p-landing')">‹</button><h3>👑 Boss Admin v7 Points + Free Ride 40km</h3><span class="badge" id="todayTotal">$0</span></div>
+ <div class="row"><div class="card" style="text-align:center"><b id="totalRides" style="font-size:26px;color:#ffd700">0</b><br><small>Bookings Ride Courier Roadside Night Owl</small></div><div class="card" style="text-align:center"><b id="totalComm" style="font-size:26px;color:#00c853">$0.00</b><br><small>Shofe 15%</small></div></div>
+ <div class="row"><div class="card" style="text-align:center"><b id="totalDriverPay" style="font-size:26px">$0.00</b><br><small>Drivers 85% Paid Even on Free Rides</small></div><div class="card" style="text-align:center"><b id="totalPoints" style="font-size:26px;color:#d48fff">0 ⭐</b><br><small>Points Issued Moneyless</small></div></div>
+ <div class="row"><div class="card" style="text-align:center"><b id="openJobs" style="font-size:26px">0</b><br><small>Open</small></div><div class="card" style="text-align:center"><b id="freeRides" style="font-size:26px;color:#ff2d7b">0</b><br><small>Free Rides 40km Redeemed</small></div></div>
+ <div class="card"><table><thead><tr><th>Time</th><th>Service</th><th>Route</th><th>Fare</th><th>15%</th><th>85% Driver</th><th>Points</th><th>Status</th></tr></thead><tbody id="jobsTable"></tbody></table><button class="btn-main btn-green" onclick="seedDemo()">Add Demo Bookings + Points</button><button class="btn-main btn-dark" onclick="clearAll()">Clear Demo</button></div>
+ <div class="card" style="background:#1a0e2a;border-color:#8d2bd4"><h3>Fix README Showing on shoferider.com</h3><p class="small">GitHub Pages shows README when index.html is missing or misnamed.<br>1. In your repo ZimConnect/shofe, ensure file is named exactly <b>index.html</b> (lowercase) in root (not in folder)<br>2. Delete or keep README.md but index.html must be in root<br>3. Settings → Pages → Source: Deploy from branch → main → / (root)<br>4. Wait 1-2 min, hard refresh shoferider.com (Ctrl+Shift+R)<br>5. Logo: You uploaded shofe-logo.png in root — v7 uses img src="shofe-logo.png" so it will show<br>6. Clickable: Buttons use showPage() — no external links needed</p></div>
+</section>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+'use strict';
+const PRICE_PER_KM=0.38, HARARE=[-17.8252,31.0335], HARARE_G={lat:-17.8252,lng:31.0335};
+let passengerBalance=150,driverBalance=0,isLive=false,maps={},gmaps={},passengerPoints=0,freeRidesRedeemed=0;
+function money(n){return '$'+(Number(n)||0).toFixed(2)}
+function get(id){return document.getElementById(id)}
+function val(id){return (get(id)?.value||'').trim()}
+function num(id){return Math.max(0,Number(val(id))||0)}
+function setText(id,t){if(get(id))get(id).textContent=t}
+function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));window.scrollTo(0,0);setTimeout(()=>initMap(id),150);if(id==='p-admin')loadAdmin();if(id==='p-driver')renderDriverJobs();updatePointsUI();}
+function getJobs(){try{return JSON.parse(localStorage.getItem('shofe_jobs')||'[]')}catch(e){return []}}
+function saveJobs(j){localStorage.setItem('shofe_jobs',JSON.stringify(j));loadAdmin();renderDriverJobs();updatePointsUI();}
+function syncWallet(){setText('walletPassenger',money(passengerBalance));setText('walletCurrent',money(passengerBalance));setText('walletDriver',money(driverBalance));setText('driverWalletBalance',money(driverBalance));}
+function getPoints(){try{return Number(localStorage.getItem('shofe_points')||0)}catch(e){return 0}}
+function setPoints(p){passengerPoints=p;localStorage.setItem('shofe_points',p);updatePointsUI();}
+function addPointsHistory(text,pts){let h=JSON.parse(localStorage.getItem('shofe_points_history')||'[]');h.unshift({time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),text,points:pts});localStorage.setItem('shofe_points_history',JSON.stringify(h.slice(0,20)));}
+function updatePointsUI(){
+ passengerPoints=getPoints();
+ const pct=Math.min(100,(passengerPoints/400)*100);
+ const toFree=Math.max(0,400-passengerPoints);
+ setText('pointsBalance',passengerPoints);setText('pointsWallet',passengerPoints);setText('pointsToFree',toFree);setText('pointsPercent',Math.floor(pct));setText('walletBadge',passengerPoints+'⭐');setText('totalPoints',passengerPoints+' ⭐');setText('freeRides',localStorage.getItem('shofe_free_rides')||0);
+ if(get('pointsProgress'))get('pointsProgress').style.width=pct+'%';
+ if(get('pointsProgressWallet'))get('pointsProgressWallet').style.width=pct+'%';
+ setText('pointsNext',toFree>0?toFree+' more points to free ride up to 40km':'🎁 Eligible for free ride up to 40km!');
+ const eligibleEl=get('pointsFreeEligible');if(eligibleEl)eligibleEl.style.display=passengerPoints>=400?'block':'none';
+ const redeemBtnRide=get('redeemBtnRide');if(redeemBtnRide)redeemBtnRide.style.display=passengerPoints>=400?'block':'none';
+ const freeNote=get('rideFreeRideNote');if(freeNote)freeNote.style.display=passengerPoints>=400?'block':'none';
+ const hist=JSON.parse(localStorage.getItem('shofe_points_history')||'[]');
+ const histEl=get('pointsHistory');if(histEl){histEl.innerHTML=hist.length?'<h4>Points History (Moneyless Only)</h4>'+hist.map(h=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #222"><span><b>${h.time}</b> ${h.text}</span><b style="color:#d48fff">${h.points>0?'+':''}${h.points}⭐</b></div>`).join(''):'<p class="small">No points yet — Do moneyless transaction (EcoCash, Apple Pay, InnBucks, Bank Nostro) to earn 10 points per $1</p>';}
+}
+function isMoneyless(payMethod){const m=(payMethod||'').toLowerCase();return !m.includes('cash');}
+function calcPointsForFare(fare,payMethod){if(!isMoneyless(payMethod))return 0;return Math.floor(fare*10);}
+function initMap(page){
+ const mkLeaf=(id)=>{if(!maps[id]){maps[id]=L.map(id).setView(HARARE,13);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(maps[id]);}maps[id].invalidateSize();};
+ const mkG=(id)=>{if(typeof google!=='undefined'&&google.maps&&!gmaps[id]){gmaps[id]=new google.maps.Map(get(id),{center:HARARE_G,zoom:13});new google.maps.Marker({position:HARARE_G,map:gmaps[id]});} };
+ if(page==='p-landing')return;
+ if(page==='p-passenger'){mkLeaf('mapRide');mkG('gmapRide');}
+ if(page==='p-courier'){mkLeaf('mapCourier');mkG('gmapCourier');}
+ if(page==='p-roadside'){mkLeaf('mapRoad');mkG('gmapRoad');}
+ if(page==='p-night'){mkLeaf('mapNight');mkG('gmapNight');}
+ if(page==='p-driver'){mkLeaf('mapDriver');mkG('gmapDriver');}
+ if(typeof google!=='undefined'&&google.maps&&google.maps.places){
+  ['from','to','cFrom','cTo','rLocation','nPickup','nDropoff'].forEach(id=>{const el=get(id);if(el&&!el.dataset.ac){new google.maps.places.Autocomplete(el);el.dataset.ac='1';}});
+ }
+}
+function toggleMap(leafId,gId){const l=get(leafId),g=get(gId);if(!l||!g)return;if(g.style.display==='none'){l.style.display='none';g.style.display='block';if(gmaps[gId])google.maps.event.trigger(gmaps[gId],'resize');}else{g.style.display='none';l.style.display='block';if(maps[leafId])maps[leafId].invalidateSize();}}
+function locateMe(id){if(!navigator.geolocation)return; navigator.geolocation.getCurrentPosition(p=>{const ll=[p.coords.latitude,p.coords.longitude];if(maps[id])maps[id].setView(ll,14);});}
+function calcGoogleDistance(){if(typeof google==='undefined'||!google.maps||!val('from')||!val('to')){setText('rideStatus','Enter pickup and drop-off for Google distance');return;} const s=new google.maps.DistanceMatrixService(); s.getDistanceMatrix({origins:[val('from')],destinations:[val('to')],travelMode:google.maps.TravelMode.DRIVING},(res,status)=>{if(status==='OK'){const km=res.rows[0].elements[0].distance.value/1000;get('distance').value=km.toFixed(1);calcRideFare();setText('rideStatus','Google Maps: '+km.toFixed(1)+' km');}else{setText('rideStatus','Google failed — enter km manually');}});}
+function calcGoogleDistanceCourier(){if(typeof google==='undefined'||!google.maps||!val('cFrom')||!val('cTo')){setText('cStatus','Enter pickup and dropoff');return;} const s=new google.maps.DistanceMatrixService(); s.getDistanceMatrix({origins:[val('cFrom')],destinations:[val('cTo')],travelMode:google.maps.TravelMode.DRIVING},(res,status)=>{if(status==='OK'){const km=res.rows[0].elements[0].distance.value/1000;get('cDistance').value=km.toFixed(1);calcCourierPrice();setText('cStatus','Google Maps: '+km.toFixed(1)+' km');}});}
+function calcRideFare(){const base=Number(val('rideType'))||2,d=num('distance'),fare=base+d*PRICE_PER_KM,pay=val('pay'),pts=calcPointsForFare(fare,pay);setText('rideBase',money(base));setText('rideDist',money(d*PRICE_PER_KM));setText('rideTotal',money(fare));setText('rideDriverPay',money(fare*.85)+' → Wallet');setText('ridePlatformFee',money(fare*.15));setText('rideKm',d.toFixed(1));setText('ridePoints',pts+' ⭐ '+(isMoneyless(pay)?'= 10 per $1 moneyless':'No points for Cash'));const badge=get('ridePointsBadge');if(badge)badge.textContent=(pts>0?'+'+pts+'⭐ moneyless':'+0⭐ cash');return fare;}
+function calcCourierPrice(){const s=get('cVehicle'),o=s.options[s.selectedIndex],base=Number(o.dataset.base)||0,rate=Number(o.dataset.km)||0,d=num('cDistance'),fare=base+d*rate,pts=calcPointsForFare(fare,'ecocash');setText('calcBase',money(base));setText('calcDist',money(d*rate));setText('calcTotal',money(fare));setText('calcDriver',money(fare*.85));setText('calcPoints',pts+' ⭐ moneyless');return fare;}
+function calcRoadside(){const d=num('rDistance'),fare=2+d*PRICE_PER_KM,pts=calcPointsForFare(fare,'ecocash');setText('rTotal',money(fare));setText('rDriver',money(fare*.85));setText('rPoints',pts+' ⭐ moneyless');return fare;}
+function calcNight(){const d=num('nDistance'),fare=20+d*1,pts=calcPointsForFare(fare,'ecocash');setText('nTotal',money(fare));setText('nDriver',money(fare*.85));setText('nPoints',pts+' ⭐ moneyless');return fare;}
+function requestRide(){
+ const pickup=val('from'),dropoff=val('to'),dist=num('distance'),fare=calcRideFare(),pay=val('pay'),pts=calcPointsForFare(fare,pay);
+ if(!pickup||!dropoff||!dist){setText('rideStatus','⚠️ Fill pickup, dropoff, distance — use Google Distance');return;}
+ if(pay!=='Cash USD'&&passengerBalance<fare){setText('rideStatus','⚠️ Insufficient balance — top up');return;}
+ if(pay!=='Cash USD')passengerBalance-=fare;driverBalance+=fare*.85;
+ if(pts>0){let cur=getPoints();cur+=pts;setPoints(cur);addPointsHistory(pickup+' → '+dropoff+' $'+fare.toFixed(2)+' moneyless',pts);}
+ syncWallet();
+ const job={id:Date.now(),time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),type:'ride',pickup,dropoff,distance:dist,fare,driverPay:fare*.85,platformFee:fare*.15,payMethod:pay,points:pts,status:'open',mapProvider:'Google Maps'};
+ const jobs=getJobs();jobs.push(job);saveJobs(jobs);
+ setText('rideStatus','✅ Ride $'+fare.toFixed(2)+' — Driver $'+(fare*.85).toFixed(2)+' (85%) to wallet. '+(pts>0?'🎁 +'+pts+' points! Total: '+getPoints()+'⭐ '+(getPoints()>=400?'🎁 Eligible FREE RIDE 40km!':''):'Cash = No points. Use EcoCash/Apple Pay for points.'));
+}
+function requestCourier(){const pickup=val('cFrom'),dropoff=val('cTo'),vehicle=val('cVehicle'),dist=num('cDistance'),fare=calcCourierPrice(),pts=calcPointsForFare(fare,'ecocash');if(!pickup||!dropoff||!dist){setText('cStatus','⚠️ Fill pickup dropoff distance');return;} let cur=getPoints();cur+=pts;setPoints(cur);addPointsHistory(vehicle+' '+pickup+'→'+dropoff+' $'+fare.toFixed(2),pts); const job={id:Date.now(),time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),type:'courier',pickup,dropoff,vehicle,distance:dist,fare,driverPay:fare*.85,platformFee:fare*.15,payMethod:'EcoCash Moneyless',points:pts,status:'open',mapProvider:'Google Maps'};const jobs=getJobs();jobs.push(job);saveJobs(jobs);setText('cStatus','✅ '+vehicle+' $'+fare.toFixed(2)+' '+dist+'km — Driver $'+(fare*.85).toFixed(2)+' (85%). +'+pts+'⭐ Total '+getPoints()+'⭐');}
+function requestRoadside(){const loc=val('rLocation'),prob=val('rProblem'),dist=num('rDistance'),fare=calcRoadside(),pts=calcPointsForFare(fare,'ecocash');if(!loc){setText('rStatus','⚠️ Enter location');return;} let cur=getPoints();cur+=pts;setPoints(cur);addPointsHistory('Roadside '+prob+' $'+fare.toFixed(2),pts); const job={id:Date.now(),time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),type:'roadside',pickup:loc,dropoff:prob,distance:dist,fare,driverPay:fare*.85,platformFee:fare*.15,payMethod:'EcoCash Moneyless',points:pts,status:'open',mapProvider:'Google Maps'};const jobs=getJobs();jobs.push(job);saveJobs(jobs);setText('rStatus','✅ Roadside $'+fare.toFixed(2)+' '+dist+'km — Driver $'+(fare*.85).toFixed(2)+' (85%). +'+pts+'⭐');}
+function requestNightOwl(){const pickup=val('nPickup'),dropoff=val('nDropoff'),dist=num('nDistance'),fare=calcNight(),pts=calcPointsForFare(fare,'ecocash');if(!pickup||!dropoff){setText('nStatus','⚠️ Fill venue and home');return;} let cur=getPoints();cur+=pts;setPoints(cur);addPointsHistory('Night Owl '+pickup+'→'+dropoff+' $'+fare.toFixed(2),pts); const job={id:Date.now(),time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),type:'nightowl',pickup,dropoff,distance:dist,fare,driverPay:fare*.85,platformFee:fare*.15,payMethod:'EcoCash Moneyless',points:pts,status:'open',mapProvider:'Google Maps'};const jobs=getJobs();jobs.push(job);saveJobs(jobs);setText('nStatus','✅ Night Owl $'+fare.toFixed(2)+' '+dist+'km — Driver $'+(fare*.85).toFixed(2)+' +'+pts+'⭐');}
+function redeemFreeRide(){
+ let pts=getPoints();if(pts<400){alert('You need 400 points for free ride up to 40km. You have '+pts+' points. Do moneyless transactions (EcoCash, Apple Pay, InnBucks, Bank Nostro) to earn 10 points per $1.');return;}
+ if(!confirm('Redeem 400 points for FREE RIDE up to 40km? Driver still gets 85% paid by Shofe. Continue?'))return;
+ pts-=400;setPoints(pts);freeRidesRedeemed=Number(localStorage.getItem('shofe_free_rides')||0)+1;localStorage.setItem('shofe_free_rides',freeRidesRedeemed);
+ const fare=17.20;const driverPay=fare*0.85;driverBalance+=driverPay;syncWallet();
+ addPointsHistory('REDEEMED Free Ride UpTo 40km (-400⭐) — Driver paid $'+driverPay.toFixed(2)+' by Shofe',-400);
+ const job={id:Date.now(),time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),type:'ride FREE 40km',pickup:'FREE RIDE Redeemed',dropoff:'Up to 40km',distance:40,fare:0,driverPay:driverPay,platformFee:-driverPay,payMethod:'Points Redeemed 400⭐',points:-400,status:'free_ride',mapProvider:'Points Rewards'};
+ const jobs=getJobs();jobs.push(job);saveJobs(jobs);
+ alert('🎁 SUCCESS! Free ride up to 40km redeemed! 400 points deducted. You have '+pts+' points left. Driver will be paid $'+driverPay.toFixed(2)+' (85%) by Shofe from points pool. Book your free ride now — enter pickup/dropoff up to 40km and select Cashless. Commission goes to driver!');
+ showPage('p-passenger');
+}
+function topupWallet(){const amt=num('topupAmount');if(amt<=0)return;passengerBalance+=amt;syncWallet();get('topupAmount').value='';}
+function cashoutDriver(){if(driverBalance<=0){alert('No earnings');return;} alert('Demo cashout $'+driverBalance.toFixed(2)+' (85%) to '+val('driverPayoutMethod')+' — Even free rides pay driver 85% — Shofe pays from points pool');driverBalance=0;syncWallet();}
+function submitVerification(){setText('verifyStatus','✅ Application submitted (demo) — Go Live enabled — 85% even on free rides');}
+function toggleLive(){isLive=!isLive;const b=get('liveBtn');b.className='live-btn '+(isLive?'live-on':'live-off');b.textContent=isLive?'GO OFFLINE':'GO LIVE 85% + Points Bonus';setText('statusText',isLive?'ONLINE — 85% even on free rides — Points system active':'OFFLINE');get('onlineBadge').textContent=isLive?'ONLINE':'OFFLINE';if(isLive)renderDriverJobs();}
+function renderDriverJobs(){const list=get('jobsList');if(!list)return;const jobs=getJobs().filter(j=>j.status==='open');if(!jobs.length){list.innerHTML='<p class="small">No open jobs — Add demo in Admin. Free rides still pay driver 85%</p>';return;}list.innerHTML=jobs.map(j=>`<div class="job"><b>${j.type.toUpperCase()} ${j.mapProvider||''} ${j.points?'+'+j.points+'⭐':''}</b><br>${j.pickup} → ${j.dropoff}<br>${j.distance}km • Fare ${j.fare>0?money(j.fare):'FREE RIDE 40km'} • You get ${money(j.driverPay)} (85%) ${j.type.includes('FREE')?'(Paid by Shofe points pool)':''}<br><small>${j.payMethod}</small><br><button class="btn-main btn-green" onclick="acceptJob(${j.id})">ACCEPT — Earn 85% Even on Free Ride</button></div>`).join('');}
+function acceptJob(id){let jobs=getJobs();jobs=jobs.map(j=>j.id===id?{...j,status:'accepted'}:j);saveJobs(jobs);alert('Accepted! 85% added — Even free rides up to 40km pay driver from points pool');}
+function loadAdmin(){const jobs=getJobs();let total=0,comm=0,drv=0,open=0,pts=0,free=0;const rows=jobs.slice().reverse().map(j=>{total+=j.fare;comm+=j.platformFee;drv+=j.driverPay;pts+=j.points||0;if(j.status==='open')open++;if(j.type.includes('FREE'))free++;return `<tr><td>${j.time}</td><td>${j.type}</td><td>${j.pickup}→${j.dropoff}<br><small>${j.distance}km ${j.mapProvider||''} ${j.vehicle||''}</small></td><td>${j.fare>0?money(j.fare):'FREE 40km'}</td><td>${money(j.platformFee)}</td><td>${money(j.driverPay)} ${j.type.includes('FREE')?'(Shofe pays)':''}</td><td>${j.points?j.points+'⭐':''}</td><td>${j.status}</td></tr>`}).join('');setText('totalRides',jobs.length);setText('totalComm',money(comm));setText('totalDriverPay',money(drv));setText('openJobs',open);setText('todayTotal',money(total));setText('freeRides',free);setText('tota
